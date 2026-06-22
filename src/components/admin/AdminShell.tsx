@@ -70,7 +70,7 @@ export function AdminShell() {
             );
           })}
         </nav>
-        <div className="absolute bottom-0 w-full space-y-2 border-t border-sidebar-border p-3 md:relative">
+        <div className="mt-4 space-y-1 border-t border-sidebar-border p-3">
           <Link to="/" className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-sidebar-accent/60"><ExternalLink className="h-4 w-4" /> View site</Link>
           <button onClick={signOut} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-sidebar-accent/60"><LogOut className="h-4 w-4" /> Sign out</button>
         </div>

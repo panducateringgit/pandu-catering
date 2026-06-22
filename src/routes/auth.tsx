@@ -22,7 +22,7 @@ function AuthPage() {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
-      if (data.user) navigate({ to: "/_authenticated/admin" as any });
+      if (data.user) navigate({ to: "/admin" as any });
     });
   }, [navigate]);
 
@@ -35,7 +35,7 @@ function AuthPage() {
     // Try to claim admin role if no admin exists yet
     await supabase.rpc("claim_first_admin");
     toast.success("Welcome back!");
-    navigate({ to: "/_authenticated/admin" as any });
+    navigate({ to: "/admin" as any });
   }
 
   async function signUp(e: React.FormEvent) {
@@ -53,7 +53,7 @@ function AuthPage() {
     if (u.user) {
       await supabase.rpc("claim_first_admin");
       toast.success("Account created!");
-      navigate({ to: "/_authenticated/admin" as any });
+      navigate({ to: "/admin" as any });
     } else {
       toast.success("Check your email to confirm your account.");
     }
