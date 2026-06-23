@@ -1,10 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { Phone, MessageCircle, MapPin, Mail, Instagram, Facebook, Youtube } from "lucide-react";
-import { BRAND, telLink, waLink } from "@/lib/constants";
+import { Phone, MessageCircle, MapPin, Mail, Instagram, Facebook, Youtube, Clock, ExternalLink } from "lucide-react";
+import { BRAND, SOCIAL, telLink, waLink } from "@/lib/constants";
 import { useSettings } from "@/hooks/useSettings";
 
 export function SiteFooter() {
   const { data: s } = useSettings();
+  const email = s?.email_contact || s?.email || BRAND.email;
+  const hours = s?.business_hours || "Mon–Sun, 7:00 AM – 11:00 PM";
   return (
     <footer className="mt-20 bg-sidebar text-sidebar-foreground">
       <div className="mx-auto max-w-7xl px-4 py-14 md:px-6">
@@ -17,10 +19,12 @@ export function SiteFooter() {
             <p className="mt-4 text-sm text-sidebar-foreground/80">
               Authentic South Indian catering with doorstep delivery across Hyderabad. Quality, hygiene, taste — every plate.
             </p>
-            <div className="mt-5 flex gap-3">
-              <a href={s?.social_instagram || "#"} className="rounded-full bg-sidebar-accent p-2 hover:bg-turmeric hover:text-turmeric-foreground" aria-label="Instagram"><Instagram className="h-4 w-4" /></a>
-              <a href={s?.social_facebook || "#"} className="rounded-full bg-sidebar-accent p-2 hover:bg-turmeric hover:text-turmeric-foreground" aria-label="Facebook"><Facebook className="h-4 w-4" /></a>
-              <a href={s?.social_youtube || "#"} className="rounded-full bg-sidebar-accent p-2 hover:bg-turmeric hover:text-turmeric-foreground" aria-label="YouTube"><Youtube className="h-4 w-4" /></a>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <a href={s?.social_instagram || SOCIAL.instagram} target="_blank" rel="noopener" className="rounded-full bg-sidebar-accent p-2 hover:bg-turmeric hover:text-turmeric-foreground" aria-label="Instagram"><Instagram className="h-4 w-4" /></a>
+              <a href={s?.social_facebook || SOCIAL.facebook} target="_blank" rel="noopener" className="rounded-full bg-sidebar-accent p-2 hover:bg-turmeric hover:text-turmeric-foreground" aria-label="Facebook"><Facebook className="h-4 w-4" /></a>
+              <a href={s?.social_youtube || SOCIAL.youtube} target="_blank" rel="noopener" className="rounded-full bg-sidebar-accent p-2 hover:bg-turmeric hover:text-turmeric-foreground" aria-label="YouTube"><Youtube className="h-4 w-4" /></a>
+              <a href={waLink("Hi Pandu Catering!")} target="_blank" rel="noopener" className="rounded-full bg-sidebar-accent p-2 hover:bg-turmeric hover:text-turmeric-foreground" aria-label="WhatsApp"><MessageCircle className="h-4 w-4" /></a>
+              <a href={s?.social_justdial || SOCIAL.justdial} target="_blank" rel="noopener" className="rounded-full bg-sidebar-accent px-3 py-2 text-xs font-bold hover:bg-turmeric hover:text-turmeric-foreground" aria-label="Justdial">JD</a>
             </div>
           </div>
 
@@ -41,26 +45,19 @@ export function SiteFooter() {
               <li className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 text-turmeric" /><span>{s?.address || "Hyderabad, Telangana, India"}</span></li>
               <li className="flex items-center gap-2"><Phone className="h-4 w-4 text-turmeric" /><a href={telLink} className="hover:text-turmeric">{BRAND.phoneDisplay}</a></li>
               <li className="flex items-center gap-2"><MessageCircle className="h-4 w-4 text-turmeric" /><a href={waLink("Hello Pandu Catering!")} className="hover:text-turmeric">WhatsApp us</a></li>
-              <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-turmeric" /><a href={`mailto:${s?.email || "hello@panducatering.in"}`} className="hover:text-turmeric">{s?.email || "hello@panducatering.in"}</a></li>
+              <li className="flex items-center gap-2"><Mail className="h-4 w-4 text-turmeric" /><a href={`mailto:${email}`} className="hover:text-turmeric break-all">{email}</a></li>
+              <li className="flex items-center gap-2"><Clock className="h-4 w-4 text-turmeric" /><span>{hours}</span></li>
+              <li className="flex items-center gap-2"><ExternalLink className="h-4 w-4 text-turmeric" /><a href={s?.google_maps_url || SOCIAL.maps} target="_blank" rel="noopener" className="hover:text-turmeric">Get Directions</a></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-display text-lg font-semibold">Get our App</h4>
-            <p className="mt-4 text-sm text-sidebar-foreground/80">Book faster on the Pandu Catering Android app.</p>
-            <a
-              href={s?.play_store_url || "#"}
-              target="_blank"
-              rel="noopener"
-              className="mt-4 inline-flex items-center gap-3 rounded-xl bg-background px-4 py-3 text-foreground shadow-soft transition hover:scale-[1.02]"
-            >
-              <svg viewBox="0 0 512 512" className="h-7 w-7"><path fill="#34A853" d="M325 234 89 470c8 4 17 4 26 0l263-152z"/><path fill="#FBBC04" d="m378 318 84-49c19-11 19-39 0-49l-79-46-92 87z"/><path fill="#4285F4" d="m291 256 88-87L116 18c-9-5-19-5-27 1z"/><path fill="#EA4335" d="M89 42v428c0 1 0 2 0 3l202-217z"/></svg>
-              <div className="leading-tight">
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">GET IT ON</div>
-                <div className="font-semibold">Google Play</div>
-              </div>
+            <h4 className="font-display text-lg font-semibold">Book Faster</h4>
+            <p className="mt-4 text-sm text-sidebar-foreground/80">Get an instant quote — usually within 30 minutes.</p>
+            <Link to="/booking" className="mt-4 block w-full rounded-md bg-turmeric px-4 py-3 text-center text-sm font-semibold text-turmeric-foreground hover:opacity-90">Get Instant Quote</Link>
+            <a href={waLink("Hi Pandu, I need a quick quote.")} target="_blank" rel="noopener" className="mt-2 block w-full rounded-md border border-sidebar-border px-4 py-3 text-center text-sm font-semibold hover:bg-sidebar-accent">
+              WhatsApp Quote
             </a>
-            <Link to="/booking" className="mt-4 block w-full rounded-md bg-turmeric px-4 py-3 text-center text-sm font-semibold text-turmeric-foreground hover:opacity-90">Book Now</Link>
           </div>
         </div>
 
