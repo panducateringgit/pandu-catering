@@ -5,26 +5,54 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { supabase } from "@/integrations/supabase/client";
 import { useSettings } from "@/hooks/useSettings";
-import { BRAND, telLink, waLink } from "@/lib/constants";
+import {
+  BRAND, SOCIAL, telLink, waLink,
+  TRUST_BADGES, PRICING_TIERS, SERVICE_AREAS, FAQS, TESTIMONIALS_EXTENDED,
+} from "@/lib/constants";
 import {
   IndianRupee, Award, Soup, Truck, Users, Sparkles, Phone, MessageCircle,
   Cake, Briefcase, Home as HomeIcon, Heart, Crown, Star, ChevronRight,
+  ShieldCheck, MapPin, FileCheck2, Leaf, CheckCircle2, ExternalLink,
 } from "lucide-react";
 import heroFeast from "@/assets/hero-feast.jpg";
 import dishBiryani from "@/assets/dish-biryani.jpg";
 import dishDosa from "@/assets/dish-dosa.jpg";
 import eventWedding from "@/assets/event-wedding.jpg";
 
+const JSONLD = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  name: "Pandu Catering",
+  image: "https://pandu-catering.lovable.app/og.jpg",
+  url: "https://pandu-catering.lovable.app",
+  telephone: "+91-99596-30445",
+  email: "pandudoddi71@gmail.com",
+  priceRange: "₹₹",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Hyderabad",
+    addressRegion: "Telangana",
+    addressCountry: "IN",
+  },
+  areaServed: ["Hyderabad", "Secunderabad", "Gachibowli", "HITEC City", "Banjara Hills", "Kukatpally"],
+  servesCuisine: ["South Indian", "Hyderabadi", "North Indian", "Chinese"],
+  sameAs: [SOCIAL.instagram, SOCIAL.facebook, SOCIAL.youtube, SOCIAL.justdial],
+  aggregateRating: { "@type": "AggregateRating", ratingValue: "4.9", reviewCount: "1200" },
+};
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Pandu Catering — Best South Indian Catering in Hyderabad" },
-      { name: "description", content: "Top-rated South Indian catering in Hyderabad. Weddings, birthdays, corporate events. Veg & non-veg, with doorstep delivery. Call +91 99596 30445." },
+      { title: "Best Catering Services in Hyderabad | Pandu Catering — Wedding, Birthday, Corporate" },
+      { name: "description", content: "Affordable South Indian catering in Hyderabad. Wedding caterers, birthday catering, corporate events. Veg & non-veg from ₹80/plate. Call +91 99596 30445." },
+      { name: "keywords", content: "Best Catering Services in Hyderabad, Wedding Caterers Hyderabad, Birthday Catering Hyderabad, South Indian Catering Hyderabad, Affordable Catering Services Hyderabad" },
       { property: "og:title", content: "Pandu Catering — Hyderabad" },
       { property: "og:description", content: "Authentic South Indian catering with doorstep delivery." },
     ],
+    scripts: [{ type: "application/ld+json", children: JSON.stringify(JSONLD) }],
   }),
   component: HomePage,
 });
@@ -46,13 +74,6 @@ const EVENT_ICONS: Record<string, any> = {
   "Family Functions": Heart,
   "Other Events": Sparkles,
 };
-
-const TESTIMONIALS = [
-  { name: "Rajesh K.", role: "Wedding, Banjara Hills", text: "Pandu Catering made our wedding unforgettable. The biryani and dosa counter were the talk of the night." },
-  { name: "Priya S.", role: "Birthday Party, Gachibowli", text: "Tasty, hot, and delivered right on time. Affordable too — exactly what we needed!" },
-  { name: "Arvind M.", role: "Corporate Event, HITEC City", text: "Hygienic packaging, professional team, and authentic taste. Booking them every quarter now." },
-  { name: "Lakshmi R.", role: "House Warming, Kukatpally", text: "Felt like home-cooked food. Guests asked who catered — happy to recommend Pandu!" },
-];
 
 function HomePage() {
   const { data: settings } = useSettings();
@@ -80,6 +101,7 @@ function HomePage() {
 
   const heroTitle = settings?.hero_title || BRAND.tagline;
   const heroSub = settings?.hero_subtitle || "";
+  const mapEmbed = settings?.map_embed || "https://www.google.com/maps?q=Hyderabad,Telangana&output=embed";
 
   return (
     <PublicLayout>
@@ -97,7 +119,7 @@ function HomePage() {
           <p className="mt-5 max-w-2xl text-base text-cream/90 md:text-lg">{heroSub}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild size="lg" className="bg-turmeric text-turmeric-foreground hover:bg-turmeric/90">
-              <Link to="/booking">Book Now <ChevronRight className="h-4 w-4" /></Link>
+              <Link to="/booking">Get Instant Quote <ChevronRight className="h-4 w-4" /></Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="border-cream/40 bg-white/10 text-cream backdrop-blur hover:bg-white/20">
               <a href={waLink("Hi Pandu Catering! I'd like to enquire.")} target="_blank" rel="noopener">
@@ -108,10 +130,15 @@ function HomePage() {
               <a href={telLink}><Phone className="h-4 w-4" /> {BRAND.phoneDisplay}</a>
             </Button>
           </div>
-          <div className="mt-10 flex flex-wrap items-center gap-6 text-cream/80">
-            <div className="flex items-center gap-2"><Star className="h-4 w-4 fill-turmeric text-turmeric" /><span className="text-sm">4.9 / 5 from 1200+ events</span></div>
-            <div className="text-sm">• 10+ years in Hyderabad</div>
-            <div className="text-sm">• 50,000+ guests served</div>
+
+          {/* Trust badges */}
+          <div className="mt-10 grid w-full max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
+            {TRUST_BADGES.map((b) => (
+              <div key={b.label} className="rounded-xl border border-cream/20 bg-white/10 px-4 py-3 text-cream backdrop-blur">
+                <div className="font-display text-2xl font-bold text-turmeric">{b.value}</div>
+                <div className="text-xs leading-tight text-cream/85">{b.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -175,6 +202,40 @@ function HomePage() {
         </div>
       </section>
 
+      {/* PRICING */}
+      <section id="pricing" className="mx-auto max-w-7xl px-4 py-20 md:px-6">
+        <div className="text-center">
+          <p className="text-sm font-semibold uppercase tracking-widest text-primary">Transparent pricing</p>
+          <h2 className="mt-2 font-display text-3xl font-bold md:text-5xl">Plates starting at ₹80</h2>
+          <p className="mt-3 text-muted-foreground">Indicative per-plate rates. Final quote depends on menu, guest count and services.</p>
+        </div>
+        <div className="mt-12 grid gap-6 md:grid-cols-3">
+          {PRICING_TIERS.map((t) => (
+            <Card key={t.name} className={`relative border-2 transition hover:-translate-y-1 hover:shadow-warm ${t.popular ? "border-turmeric shadow-warm" : "border-border/60"}`}>
+              {t.popular && (
+                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-turmeric text-turmeric-foreground">★ Most Popular</Badge>
+              )}
+              <CardContent className="p-7">
+                <h3 className="font-display text-2xl font-bold">{t.name}</h3>
+                <div className="mt-3 flex items-baseline gap-1">
+                  <span className="text-sm text-muted-foreground">from</span>
+                  <span className="font-display text-4xl font-bold text-primary">₹{t.price}</span>
+                  <span className="text-sm text-muted-foreground">/plate</span>
+                </div>
+                <ul className="mt-5 space-y-2.5 text-sm">
+                  {t.features.map((f) => (
+                    <li key={f} className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-leaf" /><span>{f}</span></li>
+                  ))}
+                </ul>
+                <Button asChild className={`mt-6 w-full ${t.popular ? "bg-turmeric text-turmeric-foreground hover:bg-turmeric/90" : ""}`}>
+                  <Link to="/booking">Request Custom Quote</Link>
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+
       {/* MENU PREVIEW */}
       <section className="mx-auto max-w-7xl px-4 py-20 md:px-6">
         <div className="text-center">
@@ -225,6 +286,73 @@ function HomePage() {
         </div>
       </section>
 
+      {/* SERVICE AREAS + MAP */}
+      <section className="bg-secondary/40 py-20">
+        <div className="mx-auto max-w-7xl px-4 md:px-6">
+          <div className="text-center">
+            <p className="text-sm font-semibold uppercase tracking-widest text-primary">Service Areas</p>
+            <h2 className="mt-2 font-display text-3xl font-bold md:text-5xl">Serving across Hyderabad</h2>
+          </div>
+          <div className="mt-10 grid gap-8 lg:grid-cols-2">
+            <div className="overflow-hidden rounded-2xl shadow-warm">
+              <iframe
+                src={mapEmbed}
+                title="Pandu Catering — Hyderabad service area"
+                width="100%"
+                height="100%"
+                loading="lazy"
+                className="aspect-[4/3] w-full border-0"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+            <div>
+              <h3 className="font-display text-2xl font-semibold">We deliver to:</h3>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {SERVICE_AREAS.map((a) => (
+                  <span key={a} className="inline-flex items-center gap-1.5 rounded-full border bg-card px-4 py-2 text-sm shadow-soft">
+                    <MapPin className="h-3.5 w-3.5 text-primary" /> {a}
+                  </span>
+                ))}
+              </div>
+              <p className="mt-6 text-sm text-muted-foreground">
+                Don't see your area? We cover all of Greater Hyderabad — just call or WhatsApp us to confirm availability for your location.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Button asChild><a href={SOCIAL.maps} target="_blank" rel="noopener"><ExternalLink className="h-4 w-4" /> Open in Maps</a></Button>
+                <Button asChild variant="outline"><a href={telLink}><Phone className="h-4 w-4" /> {BRAND.phoneDisplay}</a></Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* TRUST / CERTIFICATIONS */}
+      <section className="mx-auto max-w-7xl px-4 py-20 md:px-6">
+        <div className="text-center">
+          <p className="text-sm font-semibold uppercase tracking-widest text-primary">Trust & Compliance</p>
+          <h2 className="mt-2 font-display text-3xl font-bold md:text-5xl">Catering you can trust</h2>
+        </div>
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+          {[
+            { icon: FileCheck2, title: "FSSAI Licensed", desc: settings?.fssai_license || "FSSAI registered kitchen" },
+            { icon: ShieldCheck, title: "GST Registered", desc: settings?.gst_number || "GST compliant invoicing" },
+            { icon: Award, title: "10+ Years Experience", desc: "Trusted by 5000+ families" },
+            { icon: Sparkles, title: "Hygienic Kitchen", desc: "Daily-sanitised prep areas" },
+            { icon: Leaf, title: "Fresh Ingredients", desc: "Sourced fresh, every event" },
+          ].map((t) => (
+            <Card key={t.title} className="border-border/60 text-center">
+              <CardContent className="p-6">
+                <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-turmeric/15 text-turmeric">
+                  <t.icon className="h-7 w-7" />
+                </div>
+                <h3 className="mt-4 font-display text-lg font-semibold">{t.title}</h3>
+                <p className="mt-1 text-xs text-muted-foreground">{t.desc}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+
       {/* TESTIMONIALS */}
       <section className="bg-gradient-warm py-20 text-primary-foreground">
         <div className="mx-auto max-w-7xl px-4 md:px-6">
@@ -232,15 +360,25 @@ function HomePage() {
             <p className="text-sm font-semibold uppercase tracking-widest text-cream/80">Loved across Hyderabad</p>
             <h2 className="mt-2 font-display text-3xl font-bold md:text-5xl">What our customers say</h2>
           </div>
-          <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-            {TESTIMONIALS.map((t) => (
-              <Card key={t.name} className="border-0 bg-white/10 text-primary-foreground backdrop-blur">
+          <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {TESTIMONIALS_EXTENDED.map((t) => (
+              <Card key={t.name + t.date} className="border-0 bg-white/10 text-primary-foreground backdrop-blur">
                 <CardContent className="p-6">
-                  <div className="flex gap-1 text-turmeric">{[1,2,3,4,5].map(i => <Star key={i} className="h-4 w-4 fill-current" />)}</div>
-                  <p className="mt-4 text-sm leading-relaxed">"{t.text}"</p>
-                  <div className="mt-5">
-                    <div className="font-semibold">{t.name}</div>
-                    <div className="text-xs opacity-80">{t.role}</div>
+                  <div className="flex items-center gap-3">
+                    <div className="grid h-11 w-11 place-items-center rounded-full bg-turmeric font-display text-base font-bold text-turmeric-foreground">
+                      {t.name.charAt(0)}
+                    </div>
+                    <div>
+                      <div className="font-semibold leading-tight">{t.name}</div>
+                      <div className="text-xs opacity-80">{t.role} • {t.location}</div>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex gap-1 text-turmeric">
+                    {Array.from({ length: t.rating }).map((_, i) => <Star key={i} className="h-4 w-4 fill-current" />)}
+                  </div>
+                  <p className="mt-3 text-sm leading-relaxed">"{t.text}"</p>
+                  <div className="mt-3 text-xs opacity-75">
+                    {new Date(t.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
                   </div>
                 </CardContent>
               </Card>
@@ -270,8 +408,26 @@ function HomePage() {
         </div>
       </section>
 
+      {/* FAQ */}
+      <section className="bg-secondary/40 py-20">
+        <div className="mx-auto max-w-4xl px-4 md:px-6">
+          <div className="text-center">
+            <p className="text-sm font-semibold uppercase tracking-widest text-primary">FAQ</p>
+            <h2 className="mt-2 font-display text-3xl font-bold md:text-5xl">Frequently asked questions</h2>
+          </div>
+          <Accordion type="single" collapsible className="mt-10">
+            {FAQS.map((f, i) => (
+              <AccordionItem key={i} value={`faq-${i}`} className="border-b border-border/60">
+                <AccordionTrigger className="text-left font-display text-base font-semibold hover:no-underline">{f.q}</AccordionTrigger>
+                <AccordionContent className="text-sm text-muted-foreground">{f.a}</AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+      </section>
+
       {/* CTA BANNER */}
-      <section className="mx-auto max-w-7xl px-4 pb-20 md:px-6">
+      <section className="mx-auto max-w-7xl px-4 py-20 md:px-6">
         <div className="relative overflow-hidden rounded-3xl bg-gradient-hero p-10 text-cream shadow-warm md:p-16">
           <div className="absolute -right-10 -top-10 h-64 w-64 rounded-full bg-turmeric/20 blur-3xl" />
           <div className="relative flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
@@ -280,7 +436,7 @@ function HomePage() {
               <p className="mt-3 max-w-xl text-cream/90">Talk to our team for a custom menu and quote — usually within 30 minutes.</p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Button asChild size="lg" className="bg-turmeric text-turmeric-foreground hover:bg-turmeric/90"><Link to="/booking">Book Now</Link></Button>
+              <Button asChild size="lg" className="bg-turmeric text-turmeric-foreground hover:bg-turmeric/90"><Link to="/booking">Get Instant Quote</Link></Button>
               <Button asChild size="lg" variant="outline" className="border-cream/40 bg-transparent text-cream hover:bg-white/10"><a href={waLink("Hi Pandu Catering!")}><MessageCircle className="h-4 w-4" /> WhatsApp</a></Button>
               <Button asChild size="lg" variant="ghost" className="text-cream hover:bg-white/10"><a href={telLink}><Phone className="h-4 w-4" /> Call</a></Button>
             </div>

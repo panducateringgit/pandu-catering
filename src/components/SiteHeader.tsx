@@ -45,9 +45,12 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Button asChild variant="default" size="sm" className="hidden sm:inline-flex">
+          <Button asChild size="sm" className="hidden bg-turmeric text-turmeric-foreground hover:bg-turmeric/90 md:inline-flex">
+            <Link to="/booking">Get Instant Quote</Link>
+          </Button>
+          <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex">
             <a href={telLink}>
-              <Phone className="h-4 w-4" /> Call Now
+              <Phone className="h-4 w-4" /> Call
             </a>
           </Button>
           <button

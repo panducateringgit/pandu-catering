@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { z } from "zod";
 import { PublicLayout } from "@/components/PublicLayout";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,8 +14,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { BRAND, EVENT_TYPE_OPTIONS, telLink, waLink } from "@/lib/constants";
-import { CalendarCheck, MessageCircle, Phone, CheckCircle2 } from "lucide-react";
+import { BRAND, EVENT_TYPE_OPTIONS, SERVICE_OPTIONS, telLink, waLink } from "@/lib/constants";
+import { useSettings } from "@/hooks/useSettings";
+import { CalendarCheck, MessageCircle, Phone, CheckCircle2, AlertTriangle, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/booking")({
   head: () => ({
@@ -37,14 +38,32 @@ const schema = z.object({
   with_servers: z.boolean(),
   guest_count: z.number().int().min(1, "Min 1 guest").max(5000),
   customer_name: z.string().trim().min(2, "Enter name").max(100),
-  phone: z.string().trim().min(7, "Enter phone").max(20),
+  phone: z.string().trim().min(7, "Enter phone").max(20).regex(/^[\d\s+\-()]+$/, "Invalid phone"),
   email: z.string().trim().email().max(255).optional().or(z.literal("")),
   event_address: z.string().trim().min(5, "Enter address").max(500),
   notes: z.string().max(1000).optional().or(z.literal("")),
 });
 
+// crude rate-limit: 3 submissions per 10 min from same browser
+const RATE_KEY = "pc_booking_submits";
+function rateLimitOk() {
+  if (typeof window === "undefined") return true;
+  try {
+    const now = Date.now();
+    const raw = JSON.parse(localStorage.getItem(RATE_KEY) || "[]") as number[];
+    const fresh = raw.filter((t) => now - t < 10 * 60_000);
+    if (fresh.length >= 3) return false;
+    fresh.push(now);
+    localStorage.setItem(RATE_KEY, JSON.stringify(fresh));
+    return true;
+  } catch { return true; }
+}
+
 function BookingPage() {
   const qc = useQueryClient();
+  const { data: settings } = useSettings();
+  const capacity = Number(settings?.kitchen_capacity_per_day || 500);
+
   const [form, setForm] = useState({
     event_type: "Birthday Party",
     veg_pref: "Veg" as "Veg" | "Non-Veg" | "Both",
@@ -52,11 +71,14 @@ function BookingPage() {
     slot_time: "",
     with_servers: false,
     guest_count: 30,
+    service_type: "Food Only" as (typeof SERVICE_OPTIONS)[number],
+    menu_preferences: "",
     customer_name: "",
     phone: "",
     email: "",
     event_address: "",
     notes: "",
+    website: "", // honeypot
   });
   const [showSuccess, setShowSuccess] = useState(false);
   const [bookingId, setBookingId] = useState<string | null>(null);
@@ -70,16 +92,60 @@ function BookingPage() {
     },
   });
 
+  // Capacity per selected date
+  const { data: dayLoad } = useQuery({
+    queryKey: ["day_load", form.slot_date],
+    enabled: !!form.slot_date,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("bookings")
+        .select("guest_count,status")
+        .eq("slot_date", form.slot_date)
+        .neq("status", "Cancelled");
+      return (data ?? []).reduce((s: number, b: any) => s + (b.guest_count || 0), 0);
+    },
+  });
+
   const dates = Array.from(new Set((slots ?? []).map((s: any) => s.slot_date)));
   const timesForDate = (slots ?? []).filter((s: any) => s.slot_date === form.slot_date);
 
+  const capacityWarning = useMemo(() => {
+    if (!form.slot_date) return null;
+    const used = dayLoad ?? 0;
+    const projected = used + (form.guest_count || 0);
+    if (projected > capacity) {
+      return `We already have ${used} guests booked on this date (capacity ${capacity}). Adding ${form.guest_count} would exceed it — please pick another date or call us to confirm.`;
+    }
+    if (projected > capacity * 0.85) {
+      return `This date is nearly full (${used}/${capacity} guests booked). Submit your request and we'll confirm quickly.`;
+    }
+    return null;
+  }, [form.slot_date, form.guest_count, dayLoad, capacity]);
+
   const submit = useMutation({
     mutationFn: async () => {
+      // honeypot
+      if (form.website && form.website.length > 0) {
+        throw new Error("Spam detected.");
+      }
+      if (!rateLimitOk()) {
+        throw new Error("Too many submissions. Please wait a few minutes or call us.");
+      }
       const parsed = schema.safeParse(form);
       if (!parsed.success) {
         throw new Error(parsed.error.issues[0]?.message || "Invalid form");
       }
-      const payload = { ...parsed.data, email: parsed.data.email || null };
+      // Hard block over capacity
+      const used = dayLoad ?? 0;
+      if (used + parsed.data.guest_count > capacity) {
+        throw new Error(`Capacity exceeded for ${parsed.data.slot_date}. Try another date or call ${BRAND.phoneDisplay}.`);
+      }
+      const noteSuffix = `\n[Service: ${form.service_type}]${form.menu_preferences ? `\n[Menu prefs: ${form.menu_preferences}]` : ""}`;
+      const payload = {
+        ...parsed.data,
+        email: parsed.data.email || null,
+        notes: (parsed.data.notes || "") + noteSuffix,
+      };
       const { data, error } = await supabase.from("bookings").insert(payload).select("id").single();
       if (error) throw error;
       return data;
@@ -88,6 +154,7 @@ function BookingPage() {
       setBookingId(data.id);
       setShowSuccess(true);
       qc.invalidateQueries({ queryKey: ["slots_public"] });
+      qc.invalidateQueries({ queryKey: ["day_load"] });
       toast.success("Booking request received!");
     },
     onError: (e: any) => toast.error(e.message || "Could not submit booking"),
@@ -95,7 +162,7 @@ function BookingPage() {
 
   const set = (k: keyof typeof form) => (v: any) => setForm((f) => ({ ...f, [k]: v }));
 
-  const waMessage = `Hi Pandu Catering!%0A%0AI'd like to book catering:%0A• Event: ${form.event_type}%0A• Menu: ${form.veg_pref}%0A• Date: ${form.slot_date} (${form.slot_time})%0A• Guests: ${form.guest_count}%0A• Servers: ${form.with_servers ? "Yes" : "No"}%0A• Name: ${form.customer_name}%0A• Phone: ${form.phone}%0A• Address: ${form.event_address}%0A${form.notes ? `• Notes: ${form.notes}` : ""}`;
+  const waMessage = `Hi Pandu Catering!%0A%0AI'd like to book catering:%0A• Event: ${form.event_type}%0A• Service: ${form.service_type}%0A• Menu: ${form.veg_pref}%0A• Date: ${form.slot_date} (${form.slot_time})%0A• Guests: ${form.guest_count}%0A• Servers: ${form.with_servers ? "Yes" : "No"}%0A• Name: ${form.customer_name}%0A• Phone: ${form.phone}%0A• Address: ${form.event_address}%0A${form.menu_preferences ? `• Menu prefs: ${form.menu_preferences}%0A` : ""}${form.notes ? `• Notes: ${form.notes}` : ""}`;
 
   return (
     <PublicLayout>
@@ -115,6 +182,12 @@ function BookingPage() {
         <Card className="border-border/60 shadow-soft">
           <CardContent className="p-6 md:p-10">
             <form onSubmit={(e) => { e.preventDefault(); submit.mutate(); }} className="grid gap-6">
+              {/* Honeypot — hidden from real users */}
+              <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
+                <Label htmlFor="website">Website (leave blank)</Label>
+                <Input id="website" tabIndex={-1} autoComplete="off" value={form.website} onChange={(e) => set("website")(e.target.value)} />
+              </div>
+
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label>Event type</Label>
@@ -167,38 +240,51 @@ function BookingPage() {
                 </div>
               </div>
 
+              {capacityWarning && (
+                <div className="flex items-start gap-3 rounded-lg border border-turmeric/40 bg-turmeric/10 p-4 text-sm">
+                  <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-turmeric" />
+                  <div>
+                    <div className="font-semibold">Heads up</div>
+                    <p className="mt-1 text-muted-foreground">{capacityWarning}</p>
+                  </div>
+                </div>
+              )}
+
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="space-y-2">
                   <Label>Number of guests</Label>
-                  <Input type="number" min={1} value={form.guest_count} onChange={(e) => set("guest_count")(Number(e.target.value))} />
+                  <Input type="number" min={1} max={5000} value={form.guest_count} onChange={(e) => set("guest_count")(Number(e.target.value))} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Food servers</Label>
-                  <RadioGroup className="flex gap-3" value={form.with_servers ? "yes" : "no"} onValueChange={(v) => set("with_servers")(v === "yes")}>
-                    {[
-                      { v: "yes", label: "With Servers" },
-                      { v: "no", label: "Without Servers" },
-                    ].map(o => (
-                      <Label key={o.v} htmlFor={`srv-${o.v}`} className={`flex-1 cursor-pointer rounded-md border px-4 py-3 text-center transition ${(form.with_servers ? "yes" : "no") === o.v ? "border-primary bg-primary/5 text-primary" : ""}`}>
-                        <RadioGroupItem id={`srv-${o.v}`} value={o.v} className="sr-only" />
-                        {o.label}
-                      </Label>
-                    ))}
-                  </RadioGroup>
+                  <Label>Required services</Label>
+                  <Select value={form.service_type} onValueChange={(v) => setForm((f) => ({ ...f, service_type: v as any, with_servers: v !== "Food Only" }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {SERVICE_OPTIONS.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
               <div className="grid gap-6 md:grid-cols-2">
-                <div className="space-y-2"><Label>Your name</Label><Input value={form.customer_name} onChange={(e) => set("customer_name")(e.target.value)} required /></div>
-                <div className="space-y-2"><Label>Phone number</Label><Input type="tel" value={form.phone} onChange={(e) => set("phone")(e.target.value)} required /></div>
+                <div className="space-y-2"><Label>Your name</Label><Input value={form.customer_name} onChange={(e) => set("customer_name")(e.target.value)} required maxLength={100} /></div>
+                <div className="space-y-2"><Label>Mobile number</Label><Input type="tel" value={form.phone} onChange={(e) => set("phone")(e.target.value)} required maxLength={20} /></div>
               </div>
 
               <div className="grid gap-6 md:grid-cols-2">
-                <div className="space-y-2"><Label>Email (optional)</Label><Input type="email" value={form.email} onChange={(e) => set("email")(e.target.value)} /></div>
-                <div className="space-y-2"><Label>Event address</Label><Input value={form.event_address} onChange={(e) => set("event_address")(e.target.value)} required /></div>
+                <div className="space-y-2"><Label>Email (optional)</Label><Input type="email" value={form.email} onChange={(e) => set("email")(e.target.value)} maxLength={255} /></div>
+                <div className="space-y-2"><Label>Event location / address</Label><Input value={form.event_address} onChange={(e) => set("event_address")(e.target.value)} required maxLength={500} /></div>
               </div>
 
-              <div className="space-y-2"><Label>Special requests / notes</Label><Textarea rows={4} value={form.notes} onChange={(e) => set("notes")(e.target.value)} placeholder="Allergies, theme, special dishes, decor coordination..." /></div>
+              <div className="space-y-2"><Label>Menu preferences (dishes, cuisines)</Label><Input value={form.menu_preferences} onChange={(e) => set("menu_preferences")(e.target.value)} placeholder="e.g. Hyderabadi biryani, Andhra meals, paneer dishes" maxLength={300} /></div>
+
+              <div className="space-y-2"><Label>Additional notes</Label><Textarea rows={4} value={form.notes} onChange={(e) => set("notes")(e.target.value)} placeholder="Allergies, theme, setup, decor coordination..." maxLength={1000} /></div>
+
+              {/* reCAPTCHA placeholder — wire with VITE_RECAPTCHA_SITE_KEY when ready */}
+              <div className="flex items-center gap-3 rounded-md border border-dashed border-border bg-muted/40 px-4 py-3 text-xs text-muted-foreground">
+                <ShieldCheck className="h-4 w-4 text-leaf" />
+                <span>Protected by spam filter & rate limiting. Add reCAPTCHA site key later for extra protection.</span>
+              </div>
 
               <div className="flex flex-wrap items-center gap-3 pt-2">
                 <Button type="submit" size="lg" disabled={submit.isPending}>
