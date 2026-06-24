@@ -21,10 +21,24 @@ export const Route = createFileRoute("/menu")({
       { name: "description", content: "Browse our full catering menu: South Indian, North Indian, Chinese, snacks, desserts, beverages. Veg & non-veg." },
       { property: "og:title", content: "Menu — Pandu Catering" },
       { property: "og:description", content: "Authentic catering menu with veg & non-veg options." },
+      { property: "og:url", content: "https://pandu-catering.lovable.app/menu" },
     ],
+    links: [{ rel: "canonical", href: "https://pandu-catering.lovable.app/menu" }],
+    scripts: [{
+      type: "application/ld+json",
+      children: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        name: "Pandu Catering Menu",
+        url: "https://pandu-catering.lovable.app/menu",
+        about: "Veg and non-veg catering menu including South Indian, North Indian, Chinese, snacks, desserts and beverages.",
+        isPartOf: { "@type": "WebSite", name: "Pandu Catering", url: "https://pandu-catering.lovable.app" },
+      }),
+    }],
   }),
   component: MenuPage,
 });
+
 
 function MenuPage() {
   const [vegFilter, setVegFilter] = useState<"all" | "veg" | "nonveg">("all");
