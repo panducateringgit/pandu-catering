@@ -50,7 +50,7 @@ function GalleryPage() {
                   <source src={g.url} />
                 </video>
               ) : (
-                <img src={g.url} alt={g.caption || "Pandu Catering event"} loading={i < 4 ? "eager" : "lazy"} className="w-full" />
+                <img src={g.url} alt={g.caption || `Pandu Catering Hyderabad event photo ${i + 1}`} loading={i < 4 ? "eager" : "lazy"} className="w-full" />
               )}
               {g.caption && <div className="bg-card p-3 text-sm text-muted-foreground">{g.caption}</div>}
             </div>

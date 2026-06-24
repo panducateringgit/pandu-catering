@@ -51,11 +51,14 @@ export const Route = createFileRoute("/")({
       { name: "keywords", content: "Best Catering Services in Hyderabad, Wedding Caterers Hyderabad, Birthday Catering Hyderabad, South Indian Catering Hyderabad, Affordable Catering Services Hyderabad" },
       { property: "og:title", content: "Pandu Catering — Hyderabad" },
       { property: "og:description", content: "Authentic South Indian catering with doorstep delivery." },
+      { property: "og:url", content: "https://pandu-catering.lovable.app/" },
     ],
+    links: [{ rel: "canonical", href: "https://pandu-catering.lovable.app/" }],
     scripts: [{ type: "application/ld+json", children: JSON.stringify(JSONLD) }],
   }),
   component: HomePage,
 });
+
 
 const WHY = [
   { icon: IndianRupee, title: "Affordable Pricing", desc: "Transparent rates with no hidden charges." },
@@ -108,7 +111,7 @@ function HomePage() {
       {/* HERO */}
       <section className="relative isolate overflow-hidden">
         <div className="absolute inset-0 -z-10">
-          <img src={heroFeast} alt="South Indian feast" className="h-full w-full object-cover" />
+          <img src={heroFeast} alt="South Indian wedding feast spread by Pandu Catering Hyderabad" width="1920" height="1280" fetchPriority="high" className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-overlay" />
         </div>
         <div className="mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-center px-4 py-20 md:px-6">
@@ -402,7 +405,7 @@ function HomePage() {
             { id: "h5", url: heroFeast }, { id: "h6", url: dishBiryani }, { id: "h7", url: dishDosa }, { id: "h8", url: eventWedding },
           ]).map((g: any, i: number) => (
             <div key={g.id} className={`group relative overflow-hidden rounded-xl shadow-soft ${i % 5 === 0 ? "row-span-2 aspect-[3/4]" : "aspect-square"}`}>
-              <img src={g.url} alt={g.caption || ""} className="h-full w-full object-cover transition duration-500 group-hover:scale-110" loading="lazy" />
+              <img src={g.url} alt={g.caption || `Pandu Catering event photo ${i + 1}`} className="h-full w-full object-cover transition duration-500 group-hover:scale-110" loading="lazy" />
             </div>
           ))}
         </div>

@@ -1,0 +1,14 @@
+# Pandu Catering
+
+> Delicious, authentic and affordable South Indian catering in Hyderabad — weddings, corporate events, birthdays and house parties with doorstep delivery. Veg and non-veg menus from ₹80/plate. Phone: +91 99596 30445.
+
+Pandu Catering is a Hyderabad-based catering business specializing in Hyderabadi, Telugu and broader South Indian cuisine, plus North Indian and Indo-Chinese options. We serve weddings, engagements, corporate events, birthdays and house parties across Greater Hyderabad (Secunderabad, Gachibowli, HITEC City, Banjara Hills, Kukatpally and more). FSSAI licensed and GST registered.
+
+## Pages
+
+- [Home](/): Overview, pricing tiers, service areas, trust info and quick quote.
+- [Menu](/menu): Full veg and non-veg menu — South Indian, North Indian, Chinese, snacks, desserts, beverages.
+- [Booking](/booking): Request a quote with date, guest count, event type and menu preferences.
+- [Gallery](/gallery): Photos from past weddings, corporate days and house parties.
+- [About](/about): Story, kitchen standards, team and certifications.
+- [Contact](/contact): Phone, WhatsApp, email, address and service-area map.
