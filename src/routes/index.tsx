@@ -111,7 +111,7 @@ function HomePage() {
       {/* HERO */}
       <section className="relative isolate overflow-hidden">
         <div className="absolute inset-0 -z-10">
-          <img src={heroFeast} alt="South Indian feast" className="h-full w-full object-cover" />
+          <img src={heroFeast} alt="South Indian wedding feast spread by Pandu Catering Hyderabad" width="1920" height="1280" fetchPriority="high" className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-overlay" />
         </div>
         <div className="mx-auto flex min-h-[88vh] max-w-7xl flex-col justify-center px-4 py-20 md:px-6">
