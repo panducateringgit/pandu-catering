@@ -405,7 +405,7 @@ function HomePage() {
             { id: "h5", url: heroFeast }, { id: "h6", url: dishBiryani }, { id: "h7", url: dishDosa }, { id: "h8", url: eventWedding },
           ]).map((g: any, i: number) => (
             <div key={g.id} className={`group relative overflow-hidden rounded-xl shadow-soft ${i % 5 === 0 ? "row-span-2 aspect-[3/4]" : "aspect-square"}`}>
-              <img src={g.url} alt={g.caption || ""} className="h-full w-full object-cover transition duration-500 group-hover:scale-110" loading="lazy" />
+              <img src={g.url} alt={g.caption || `Pandu Catering event photo ${i + 1}`} className="h-full w-full object-cover transition duration-500 group-hover:scale-110" loading="lazy" />
             </div>
           ))}
         </div>
