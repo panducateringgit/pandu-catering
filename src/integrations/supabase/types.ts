@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_allowlist: {
+        Row: {
+          created_at: string
+          email: string
+          note: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          note?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          note?: string | null
+        }
+        Relationships: []
+      }
       booking_slots: {
         Row: {
           available: boolean
@@ -131,6 +149,39 @@ export type Database = {
         }
         Relationships: []
       }
+      gallery_images: {
+        Row: {
+          alt_text: string
+          caption: string | null
+          created_at: string
+          id: string
+          image_url: string
+          sort_order: number
+          storage_path: string | null
+          updated_at: string
+        }
+        Insert: {
+          alt_text: string
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_url: string
+          sort_order?: number
+          storage_path?: string | null
+          updated_at?: string
+        }
+        Update: {
+          alt_text?: string
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string
+          sort_order?: number
+          storage_path?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       gallery_media: {
         Row: {
           caption: string | null
@@ -173,6 +224,7 @@ export type Database = {
           name: string
           price: number
           sort_order: number
+          storage_path: string | null
           updated_at: string
         }
         Insert: {
@@ -186,6 +238,7 @@ export type Database = {
           name: string
           price?: number
           sort_order?: number
+          storage_path?: string | null
           updated_at?: string
         }
         Update: {
@@ -199,6 +252,46 @@ export type Database = {
           name?: string
           price?: number
           sort_order?: number
+          storage_path?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pricing_plans: {
+        Row: {
+          active: boolean
+          category: string
+          created_at: string
+          features: Json
+          id: string
+          is_popular: boolean
+          price_label: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          category: string
+          created_at?: string
+          features?: Json
+          id?: string
+          is_popular?: boolean
+          price_label: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          features?: Json
+          id?: string
+          is_popular?: boolean
+          price_label?: string
+          sort_order?: number
+          title?: string
           updated_at?: string
         }
         Relationships: []
@@ -255,6 +348,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role: "admin"
