@@ -51,11 +51,14 @@ export const Route = createFileRoute("/")({
       { name: "keywords", content: "Best Catering Services in Hyderabad, Wedding Caterers Hyderabad, Birthday Catering Hyderabad, South Indian Catering Hyderabad, Affordable Catering Services Hyderabad" },
       { property: "og:title", content: "Pandu Catering — Hyderabad" },
       { property: "og:description", content: "Authentic South Indian catering with doorstep delivery." },
+      { property: "og:url", content: "https://pandu-catering.lovable.app/" },
     ],
+    links: [{ rel: "canonical", href: "https://pandu-catering.lovable.app/" }],
     scripts: [{ type: "application/ld+json", children: JSON.stringify(JSONLD) }],
   }),
   component: HomePage,
 });
+
 
 const WHY = [
   { icon: IndianRupee, title: "Affordable Pricing", desc: "Transparent rates with no hidden charges." },
