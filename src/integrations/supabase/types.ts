@@ -348,7 +348,9 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_admin: { Args: never; Returns: boolean }
+      is_admin:
+        | { Args: never; Returns: boolean }
+        | { Args: { check_email: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin"

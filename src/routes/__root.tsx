@@ -61,6 +61,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7f38d4be-75a6-4b50-88b3-b3d2d5a86603/id-preview-0cf1c1d1--c9e8672b-2af6-4a72-872b-cfb240981814.lovable.app-1782115346618.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7f38d4be-75a6-4b50-88b3-b3d2d5a86603/id-preview-0cf1c1d1--c9e8672b-2af6-4a72-872b-cfb240981814.lovable.app-1782115346618.png" },
+      // TODO: Replace REPLACE_WITH_GSC_TOKEN with the verification string from Google Search Console once the property is added.
+      { name: "google-site-verification", content: "REPLACE_WITH_GSC_TOKEN" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

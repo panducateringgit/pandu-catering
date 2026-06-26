@@ -19,6 +19,11 @@ export const SOCIAL = {
 export const waLink = (msg?: string) =>
   `https://wa.me/${BRAND.whatsappNumber}${msg ? `?text=${encodeURIComponent(msg)}` : ""}`;
 
+export const ORDER_WA_MESSAGE =
+  "Hello Pandu, I want to order food from your catering. I want to know about pricing and menu list for veg and non-veg. If you are available, please ping me or call me to confirm the order.";
+
+export const orderWaLink = waLink(ORDER_WA_MESSAGE);
+
 export const telLink = `tel:${BRAND.phoneDial}`;
 
 export const MENU_CATEGORIES = [
