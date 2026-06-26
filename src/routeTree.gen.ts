@@ -9,7 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VegRouteImport } from './routes/veg'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as NonVegRouteImport } from './routes/non-veg'
 import { Route as MenuRouteImport } from './routes/menu'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -28,9 +30,19 @@ import { Route as AuthenticatedAdminGalleryRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminEventsRouteImport } from './routes/_authenticated/admin.events'
 import { Route as AuthenticatedAdminBookingsRouteImport } from './routes/_authenticated/admin.bookings'
 
+const VegRoute = VegRouteImport.update({
+  id: '/veg',
+  path: '/veg',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NonVegRoute = NonVegRouteImport.update({
+  id: '/non-veg',
+  path: '/non-veg',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MenuRoute = MenuRouteImport.update({
@@ -130,7 +142,9 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
   '/menu': typeof MenuRoute
+  '/non-veg': typeof NonVegRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/veg': typeof VegRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
   '/admin/bookings': typeof AuthenticatedAdminBookingsRoute
@@ -149,7 +163,9 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
   '/menu': typeof MenuRoute
+  '/non-veg': typeof NonVegRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/veg': typeof VegRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/bookings': typeof AuthenticatedAdminBookingsRoute
   '/admin/events': typeof AuthenticatedAdminEventsRoute
@@ -169,7 +185,9 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/gallery': typeof GalleryRoute
   '/menu': typeof MenuRoute
+  '/non-veg': typeof NonVegRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/veg': typeof VegRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
   '/_authenticated/admin/bookings': typeof AuthenticatedAdminBookingsRoute
@@ -190,7 +208,9 @@ export interface FileRouteTypes {
     | '/contact'
     | '/gallery'
     | '/menu'
+    | '/non-veg'
     | '/sitemap.xml'
+    | '/veg'
     | '/admin'
     | '/admin/login'
     | '/admin/bookings'
@@ -209,7 +229,9 @@ export interface FileRouteTypes {
     | '/contact'
     | '/gallery'
     | '/menu'
+    | '/non-veg'
     | '/sitemap.xml'
+    | '/veg'
     | '/admin/login'
     | '/admin/bookings'
     | '/admin/events'
@@ -228,7 +250,9 @@ export interface FileRouteTypes {
     | '/contact'
     | '/gallery'
     | '/menu'
+    | '/non-veg'
     | '/sitemap.xml'
+    | '/veg'
     | '/_authenticated/admin'
     | '/admin/login'
     | '/_authenticated/admin/bookings'
@@ -249,17 +273,33 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   GalleryRoute: typeof GalleryRoute
   MenuRoute: typeof MenuRoute
+  NonVegRoute: typeof NonVegRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  VegRoute: typeof VegRoute
   AdminLoginRoute: typeof AdminLoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/veg': {
+      id: '/veg'
+      path: '/veg'
+      fullPath: '/veg'
+      preLoaderRoute: typeof VegRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/non-veg': {
+      id: '/non-veg'
+      path: '/non-veg'
+      fullPath: '/non-veg'
+      preLoaderRoute: typeof NonVegRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/menu': {
@@ -427,7 +467,9 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   GalleryRoute: GalleryRoute,
   MenuRoute: MenuRoute,
+  NonVegRoute: NonVegRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  VegRoute: VegRoute,
   AdminLoginRoute: AdminLoginRoute,
 }
 export const routeTree = rootRouteImport
