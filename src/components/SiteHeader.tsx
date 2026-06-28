@@ -8,8 +8,6 @@ import logo from "@/assets/pandu-logo.png";
 const NAV = [
   { to: "/", label: "Home" },
   { to: "/menu", label: "Menu" },
-  { to: "/veg", label: "Veg" },
-  { to: "/non-veg", label: "Non-Veg" },
   { to: "/booking", label: "Book Now" },
   { to: "/gallery", label: "Gallery" },
   { to: "/about", label: "About" },
