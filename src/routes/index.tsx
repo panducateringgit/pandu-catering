@@ -1,16 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 import { PublicLayout } from "@/components/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useSettings } from "@/hooks/useSettings";
 import {
   BRAND, SOCIAL, telLink, waLink, orderWaLink,
-  TRUST_BADGES, PRICING_TIERS, SERVICE_AREAS, FAQS, TESTIMONIALS_EXTENDED,
+  TRUST_BADGES, PRICING_TIERS, PRICING_ADDONS, SERVICE_AREAS, FAQS, TESTIMONIALS_EXTENDED,
 } from "@/lib/constants";
 import {
   IndianRupee, Award, Soup, Truck, Users, Sparkles, Phone, MessageCircle,
@@ -146,33 +148,8 @@ function HomePage() {
         </div>
       </section>
 
-      {/* VEG / NON-VEG QUICK PICK */}
-      <section className="border-y bg-secondary/40 py-10">
-        <div className="mx-auto grid max-w-7xl gap-4 px-4 md:grid-cols-2 md:px-6">
-          <Link
-            to="/veg"
-            className="group flex items-center justify-between gap-4 rounded-2xl bg-gradient-to-br from-leaf/90 to-leaf p-6 text-white shadow-soft transition hover:shadow-warm"
-          >
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-widest opacity-90">🟢 Pure Veg</div>
-              <div className="mt-1 font-display text-2xl font-bold md:text-3xl">Veg Catering Menu →</div>
-              <p className="mt-1 text-sm text-white/90">South Indian, North Indian & Chinese veg from ₹80/plate</p>
-            </div>
-            <ChevronRight className="h-8 w-8 transition group-hover:translate-x-1" />
-          </Link>
-          <Link
-            to="/non-veg"
-            className="group flex items-center justify-between gap-4 rounded-2xl bg-gradient-to-br from-spice/90 to-spice p-6 text-white shadow-soft transition hover:shadow-warm"
-          >
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-widest opacity-90">🔴 Non-Veg</div>
-              <div className="mt-1 font-display text-2xl font-bold md:text-3xl">Non-Veg Catering Menu →</div>
-              <p className="mt-1 text-sm text-white/90">Hyderabadi biryani, chicken, mutton & tandoor from ₹200/plate</p>
-            </div>
-            <ChevronRight className="h-8 w-8 transition group-hover:translate-x-1" />
-          </Link>
-        </div>
-      </section>
+      {/* (Veg / Non-Veg quick pick removed — veg/non-veg now shown only as tags on individual menu items) */}
+
 
 
       {/* WHY */}
@@ -234,39 +211,44 @@ function HomePage() {
         </div>
       </section>
 
-      {/* PRICING */}
+      {/* PRICING + LIVE ESTIMATOR */}
       <section id="pricing" className="mx-auto max-w-7xl px-4 py-20 md:px-6">
         <div className="text-center">
           <p className="text-sm font-semibold uppercase tracking-widest text-primary">Transparent pricing</p>
-          <h2 className="mt-2 font-display text-3xl font-bold md:text-5xl">Plates starting at ₹80</h2>
-          <p className="mt-3 text-muted-foreground">Indicative per-plate rates. Final quote depends on menu, guest count and services.</p>
+          <h2 className="mt-2 font-display text-3xl font-bold md:text-5xl">Plates starting at ₹120</h2>
+          <p className="mt-3 text-muted-foreground">Pick a plan, add what you need — the estimate updates instantly.</p>
         </div>
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
+
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {PRICING_TIERS.map((t) => (
             <Card key={t.name} className={`relative border-2 transition hover:-translate-y-1 hover:shadow-warm ${t.popular ? "border-turmeric shadow-warm" : "border-border/60"}`}>
               {t.popular && (
                 <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-turmeric text-turmeric-foreground">★ Most Popular</Badge>
               )}
-              <CardContent className="p-7">
-                <h3 className="font-display text-2xl font-bold">{t.name}</h3>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-display text-xl font-bold">{t.name}</h3>
+                  <Badge className={t.isVeg ? "bg-leaf text-white" : "bg-spice text-white"}>{t.isVeg ? "VEG" : "NON-VEG"}</Badge>
+                </div>
                 <div className="mt-3 flex items-baseline gap-1">
-                  <span className="text-sm text-muted-foreground">from</span>
-                  <span className="font-display text-4xl font-bold text-primary">₹{t.price}</span>
+                  <span className="font-display text-3xl font-bold text-primary">₹{t.price}</span>
                   <span className="text-sm text-muted-foreground">/plate</span>
                 </div>
-                <ul className="mt-5 space-y-2.5 text-sm">
+                <ul className="mt-4 space-y-2 text-sm">
                   {t.features.map((f) => (
                     <li key={f} className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-leaf" /><span>{f}</span></li>
                   ))}
                 </ul>
-                <Button asChild className={`mt-6 w-full ${t.popular ? "bg-turmeric text-turmeric-foreground hover:bg-turmeric/90" : ""}`}>
-                  <Link to="/booking">Request Custom Quote</Link>
-                </Button>
               </CardContent>
             </Card>
           ))}
         </div>
+
+        <div className="mt-12">
+          <PricingEstimator />
+        </div>
       </section>
+
 
       {/* MENU PREVIEW */}
       <section className="mx-auto max-w-7xl px-4 py-20 md:px-6">
@@ -478,3 +460,120 @@ function HomePage() {
     </PublicLayout>
   );
 }
+
+function PricingEstimator() {
+  const [planName, setPlanName] = useState(PRICING_TIERS[1].name);
+  const [guests, setGuests] = useState<number>(50);
+  const [addons, setAddons] = useState<Record<string, boolean>>({});
+
+  const plan = useMemo(
+    () => PRICING_TIERS.find((p) => p.name === planName) ?? PRICING_TIERS[0],
+    [planName],
+  );
+
+  const addonPerPlate = useMemo(
+    () => PRICING_ADDONS.filter((a) => addons[a.id]).reduce((s, a) => s + a.price, 0),
+    [addons],
+  );
+
+  const perPlate = plan.price + addonPerPlate;
+  const safeGuests = Math.max(1, Number(guests) || 0);
+  const total = perPlate * safeGuests;
+
+  const waMsg = `Hi Pandu Catering! I'd like a quote:%0A• Plan: ${plan.name} (₹${plan.price}/plate)%0A• Guests: ${safeGuests}%0A• Add-ons: ${PRICING_ADDONS.filter((a) => addons[a.id]).map((a) => a.label).join(", ") || "none"}%0A• Estimated total: ₹${total.toLocaleString("en-IN")}`;
+
+  return (
+    <Card className="border-2 border-turmeric/30 bg-gradient-to-br from-cream/40 to-background shadow-warm">
+      <CardContent className="grid gap-8 p-6 md:grid-cols-[1.2fr_1fr] md:p-10">
+        <div>
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-turmeric" />
+            <h3 className="font-display text-2xl font-bold">Live quote estimator</h3>
+          </div>
+          <p className="mt-2 text-sm text-muted-foreground">Total updates instantly as you change plan, guests, or add-ons.</p>
+
+          <div className="mt-6 space-y-5">
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Choose plan</div>
+              <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                {PRICING_TIERS.map((t) => (
+                  <button
+                    key={t.name}
+                    type="button"
+                    onClick={() => setPlanName(t.name)}
+                    className={`rounded-xl border-2 p-3 text-left transition ${planName === t.name ? "border-primary bg-primary/5" : "border-border/60 hover:border-primary/40"}`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-display font-semibold">{t.name}</span>
+                      <Badge className={t.isVeg ? "bg-leaf text-white" : "bg-spice text-white"}>{t.isVeg ? "VEG" : "NON-VEG"}</Badge>
+                    </div>
+                    <div className="mt-1 text-sm text-muted-foreground">₹{t.price} / plate</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Number of guests</div>
+              <Input
+                type="number"
+                min={1}
+                max={5000}
+                value={guests}
+                onChange={(e) => setGuests(Number(e.target.value))}
+                className="mt-2 max-w-xs"
+              />
+            </div>
+
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Add-ons (per plate)</div>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {PRICING_ADDONS.map((a) => {
+                  const on = !!addons[a.id];
+                  return (
+                    <button
+                      key={a.id}
+                      type="button"
+                      onClick={() => setAddons((s) => ({ ...s, [a.id]: !on }))}
+                      className={`rounded-full border px-3 py-1.5 text-sm transition ${on ? "border-primary bg-primary text-primary-foreground" : "hover:bg-secondary"}`}
+                    >
+                      {a.label} +₹{a.price}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-2xl bg-gradient-hero p-6 text-cream md:p-8">
+          <div className="text-xs font-semibold uppercase tracking-widest text-turmeric">Your estimate</div>
+          <div className="mt-3 flex items-baseline gap-1">
+            <span className="font-display text-5xl font-bold text-cream">₹{total.toLocaleString("en-IN")}</span>
+          </div>
+          <div className="mt-1 text-sm text-cream/85">
+            ₹{perPlate.toLocaleString("en-IN")} × {safeGuests} guests
+          </div>
+          <ul className="mt-5 space-y-1.5 text-sm text-cream/90">
+            <li className="flex justify-between"><span>{plan.name}</span><span>₹{plan.price}/plate</span></li>
+            {PRICING_ADDONS.filter((a) => addons[a.id]).map((a) => (
+              <li key={a.id} className="flex justify-between"><span>+ {a.label}</span><span>₹{a.price}/plate</span></li>
+            ))}
+          </ul>
+          <div className="mt-6 flex flex-col gap-2">
+            <Button asChild size="lg" className="bg-turmeric text-turmeric-foreground hover:bg-turmeric/90">
+              <Link to="/booking">Request custom quote</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="border-cream/40 bg-white/10 text-cream hover:bg-white/20">
+              <a href={`https://wa.me/${BRAND.whatsappNumber}?text=${waMsg}`} target="_blank" rel="noopener">
+                <MessageCircle className="h-4 w-4" /> Send on WhatsApp
+              </a>
+            </Button>
+          </div>
+          <p className="mt-3 text-[11px] text-cream/70">Indicative estimate. Final quote depends on chosen menu items, location & service date.</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+

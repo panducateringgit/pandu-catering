@@ -27,6 +27,10 @@ export const orderWaLink = waLink(ORDER_WA_MESSAGE);
 export const telLink = `tel:${BRAND.phoneDial}`;
 
 export const MENU_CATEGORIES = [
+  "Morning Tiffins",
+  "Afternoon Lunch",
+  "Evening Snacks",
+  "Night Dinners",
   "South Indian",
   "North Indian",
   "Chinese",
@@ -35,6 +39,13 @@ export const MENU_CATEGORIES = [
   "Beverages",
 ] as const;
 export type MenuCategory = (typeof MENU_CATEGORIES)[number];
+
+export const MEAL_TIME_CATEGORIES = [
+  "Morning Tiffins",
+  "Afternoon Lunch",
+  "Evening Snacks",
+  "Night Dinners",
+] as const;
 
 export const EVENT_TYPE_OPTIONS = [
   "Birthday Party",
@@ -67,8 +78,9 @@ export const TRUST_BADGES = [
 export const PRICING_TIERS = [
   {
     name: "Veg Basic",
-    price: 80,
+    price: 120,
     popular: false,
+    isVeg: true,
     features: [
       "3 curries + dal + rice + roti",
       "Rasam, curd, pickle, papad",
@@ -79,8 +91,9 @@ export const PRICING_TIERS = [
   },
   {
     name: "Veg Premium",
-    price: 120,
+    price: 180,
     popular: true,
+    isVeg: true,
     features: [
       "Welcome drink + 2 starters",
       "4 curries + dal + biryani/rice",
@@ -90,9 +103,23 @@ export const PRICING_TIERS = [
     ],
   },
   {
-    name: "Non-Veg Premium",
-    price: 200,
+    name: "Non-Veg Basic",
+    price: 220,
     popular: false,
+    isVeg: false,
+    features: [
+      "Chicken curry + 2 veg curries",
+      "Biryani / rice + dal + roti",
+      "Rasam, curd, pickle, papad",
+      "1 dessert + 1 starter",
+      "Disposable plates included",
+    ],
+  },
+  {
+    name: "Non-Veg Premium",
+    price: 300,
+    popular: false,
+    isVeg: false,
     features: [
       "Welcome drink + 3 starters (veg + non-veg)",
       "Chicken + Mutton biryani / curries",
@@ -101,6 +128,15 @@ export const PRICING_TIERS = [
       "Full serving staff + setup",
     ],
   },
+];
+
+// Add-ons used by the live pricing estimator (per plate unless noted)
+export const PRICING_ADDONS = [
+  { id: "welcome_drink", label: "Welcome drink", price: 25 },
+  { id: "extra_dessert", label: "Extra dessert", price: 35 },
+  { id: "live_counter", label: "Live dosa/chaat counter", price: 60 },
+  { id: "serving_staff", label: "Serving staff & setup", price: 20 },
+  { id: "premium_plates", label: "Premium plates & cutlery", price: 15 },
 ];
 
 export const FAQS = [
