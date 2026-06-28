@@ -211,39 +211,44 @@ function HomePage() {
         </div>
       </section>
 
-      {/* PRICING */}
+      {/* PRICING + LIVE ESTIMATOR */}
       <section id="pricing" className="mx-auto max-w-7xl px-4 py-20 md:px-6">
         <div className="text-center">
           <p className="text-sm font-semibold uppercase tracking-widest text-primary">Transparent pricing</p>
-          <h2 className="mt-2 font-display text-3xl font-bold md:text-5xl">Plates starting at ₹80</h2>
-          <p className="mt-3 text-muted-foreground">Indicative per-plate rates. Final quote depends on menu, guest count and services.</p>
+          <h2 className="mt-2 font-display text-3xl font-bold md:text-5xl">Plates starting at ₹120</h2>
+          <p className="mt-3 text-muted-foreground">Pick a plan, add what you need — the estimate updates instantly.</p>
         </div>
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
+
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {PRICING_TIERS.map((t) => (
             <Card key={t.name} className={`relative border-2 transition hover:-translate-y-1 hover:shadow-warm ${t.popular ? "border-turmeric shadow-warm" : "border-border/60"}`}>
               {t.popular && (
                 <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-turmeric text-turmeric-foreground">★ Most Popular</Badge>
               )}
-              <CardContent className="p-7">
-                <h3 className="font-display text-2xl font-bold">{t.name}</h3>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-display text-xl font-bold">{t.name}</h3>
+                  <Badge className={t.isVeg ? "bg-leaf text-white" : "bg-spice text-white"}>{t.isVeg ? "VEG" : "NON-VEG"}</Badge>
+                </div>
                 <div className="mt-3 flex items-baseline gap-1">
-                  <span className="text-sm text-muted-foreground">from</span>
-                  <span className="font-display text-4xl font-bold text-primary">₹{t.price}</span>
+                  <span className="font-display text-3xl font-bold text-primary">₹{t.price}</span>
                   <span className="text-sm text-muted-foreground">/plate</span>
                 </div>
-                <ul className="mt-5 space-y-2.5 text-sm">
+                <ul className="mt-4 space-y-2 text-sm">
                   {t.features.map((f) => (
                     <li key={f} className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-leaf" /><span>{f}</span></li>
                   ))}
                 </ul>
-                <Button asChild className={`mt-6 w-full ${t.popular ? "bg-turmeric text-turmeric-foreground hover:bg-turmeric/90" : ""}`}>
-                  <Link to="/booking">Request Custom Quote</Link>
-                </Button>
               </CardContent>
             </Card>
           ))}
         </div>
+
+        <div className="mt-12">
+          <PricingEstimator />
+        </div>
       </section>
+
 
       {/* MENU PREVIEW */}
       <section className="mx-auto max-w-7xl px-4 py-20 md:px-6">
