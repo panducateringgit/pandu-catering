@@ -42,18 +42,31 @@ function GalleryPage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-14 md:px-6">
-        <div className="columns-1 gap-4 sm:columns-2 lg:columns-3 xl:columns-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {items.map((g, i) => (
-            <div key={g.id} className="mb-4 break-inside-avoid overflow-hidden rounded-2xl shadow-soft transition hover:shadow-warm">
-              {g.media_type === "video" ? (
-                <video controls className="w-full" preload="metadata">
-                  <source src={g.url} />
-                </video>
-              ) : (
-                <img src={g.url} alt={g.caption || `Pandu Catering Hyderabad event photo ${i + 1}`} loading={i < 4 ? "eager" : "lazy"} className="w-full" />
+            <figure key={g.id} className="group overflow-hidden rounded-2xl shadow-soft transition hover:shadow-warm">
+              <div className="relative aspect-square w-full overflow-hidden bg-muted">
+                {g.media_type === "video" ? (
+                  <video
+                    controls
+                    preload="metadata"
+                    className="absolute inset-0 h-full w-full object-cover"
+                  >
+                    <source src={g.url} />
+                  </video>
+                ) : (
+                  <img
+                    src={g.url}
+                    alt={g.caption || `Pandu Catering Hyderabad event photo ${i + 1}`}
+                    loading={i < 4 ? "eager" : "lazy"}
+                    className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  />
+                )}
+              </div>
+              {g.caption && (
+                <figcaption className="bg-card p-3 text-sm text-muted-foreground">{g.caption}</figcaption>
               )}
-              {g.caption && <div className="bg-card p-3 text-sm text-muted-foreground">{g.caption}</div>}
-            </div>
+            </figure>
           ))}
         </div>
       </section>
