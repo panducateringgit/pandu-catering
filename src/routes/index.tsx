@@ -1,16 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 import { PublicLayout } from "@/components/PublicLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useSettings } from "@/hooks/useSettings";
 import {
   BRAND, SOCIAL, telLink, waLink, orderWaLink,
-  TRUST_BADGES, PRICING_TIERS, SERVICE_AREAS, FAQS, TESTIMONIALS_EXTENDED,
+  TRUST_BADGES, PRICING_TIERS, PRICING_ADDONS, SERVICE_AREAS, FAQS, TESTIMONIALS_EXTENDED,
 } from "@/lib/constants";
 import {
   IndianRupee, Award, Soup, Truck, Users, Sparkles, Phone, MessageCircle,
