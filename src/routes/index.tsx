@@ -146,33 +146,8 @@ function HomePage() {
         </div>
       </section>
 
-      {/* VEG / NON-VEG QUICK PICK */}
-      <section className="border-y bg-secondary/40 py-10">
-        <div className="mx-auto grid max-w-7xl gap-4 px-4 md:grid-cols-2 md:px-6">
-          <Link
-            to="/veg"
-            className="group flex items-center justify-between gap-4 rounded-2xl bg-gradient-to-br from-leaf/90 to-leaf p-6 text-white shadow-soft transition hover:shadow-warm"
-          >
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-widest opacity-90">🟢 Pure Veg</div>
-              <div className="mt-1 font-display text-2xl font-bold md:text-3xl">Veg Catering Menu →</div>
-              <p className="mt-1 text-sm text-white/90">South Indian, North Indian & Chinese veg from ₹80/plate</p>
-            </div>
-            <ChevronRight className="h-8 w-8 transition group-hover:translate-x-1" />
-          </Link>
-          <Link
-            to="/non-veg"
-            className="group flex items-center justify-between gap-4 rounded-2xl bg-gradient-to-br from-spice/90 to-spice p-6 text-white shadow-soft transition hover:shadow-warm"
-          >
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-widest opacity-90">🔴 Non-Veg</div>
-              <div className="mt-1 font-display text-2xl font-bold md:text-3xl">Non-Veg Catering Menu →</div>
-              <p className="mt-1 text-sm text-white/90">Hyderabadi biryani, chicken, mutton & tandoor from ₹200/plate</p>
-            </div>
-            <ChevronRight className="h-8 w-8 transition group-hover:translate-x-1" />
-          </Link>
-        </div>
-      </section>
+      {/* (Veg / Non-Veg quick pick removed — veg/non-veg now shown only as tags on individual menu items) */}
+
 
 
       {/* WHY */}
