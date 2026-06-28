@@ -27,6 +27,10 @@ export const orderWaLink = waLink(ORDER_WA_MESSAGE);
 export const telLink = `tel:${BRAND.phoneDial}`;
 
 export const MENU_CATEGORIES = [
+  "Morning Tiffins",
+  "Afternoon Lunch",
+  "Evening Snacks",
+  "Night Dinners",
   "South Indian",
   "North Indian",
   "Chinese",
@@ -35,6 +39,13 @@ export const MENU_CATEGORIES = [
   "Beverages",
 ] as const;
 export type MenuCategory = (typeof MENU_CATEGORIES)[number];
+
+export const MEAL_TIME_CATEGORIES = [
+  "Morning Tiffins",
+  "Afternoon Lunch",
+  "Evening Snacks",
+  "Night Dinners",
+] as const;
 
 export const EVENT_TYPE_OPTIONS = [
   "Birthday Party",
