@@ -69,7 +69,11 @@ function MenuPage() {
       g[m.category] = g[m.category] || [];
       g[m.category].push(m);
     }
-    return g;
+    // Order categories by the canonical MENU_CATEGORIES list, then any extras alphabetically
+    const ordered: [string, any[]][] = [];
+    for (const c of MENU_CATEGORIES) if (g[c]?.length) ordered.push([c, g[c]]);
+    for (const c of Object.keys(g).sort()) if (!MENU_CATEGORIES.includes(c as any)) ordered.push([c, g[c]]);
+    return ordered;
   }, [filtered]);
 
   return (
@@ -109,7 +113,7 @@ function MenuPage() {
         </div>
 
         <div className="mt-10 space-y-12">
-          {Object.entries(grouped).map(([category, list]) => (
+          {grouped.map(([category, list]) => (
             <div key={category}>
               <h2 className="font-display text-2xl font-bold md:text-3xl"><span className="text-primary">{category}</span></h2>
               <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
