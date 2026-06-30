@@ -10,7 +10,18 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Plus, Trash2, Pencil } from "lucide-react";
+import { Plus, Trash2, Pencil, Upload, Loader2 } from "lucide-react";
+
+const TEN_YEARS = 60 * 60 * 24 * 365 * 10;
+async function uploadGallery(file: File): Promise<string> {
+  const ext = file.name.split(".").pop() || "jpg";
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const up = await supabase.storage.from("gallery").upload(path, file, { upsert: false, contentType: file.type });
+  if (up.error) throw up.error;
+  const signed = await supabase.storage.from("gallery").createSignedUrl(path, TEN_YEARS);
+  if (signed.error || !signed.data) throw signed.error ?? new Error("Sign URL failed");
+  return signed.data.signedUrl;
+}
 
 export const Route = createFileRoute("/_authenticated/admin/gallery")({
   component: GalleryAdminPage,
@@ -21,6 +32,16 @@ const empty = { id: "", media_type: "image" as "image" | "video", url: "", capti
 function GalleryAdminPage() {
   const qc = useQueryClient();
   const [editing, setEditing] = useState<any | null>(null);
+  const [uploading, setUploading] = useState(false);
+  async function handleFile(file: File) {
+    setUploading(true);
+    try {
+      const url = await uploadGallery(file);
+      setEditing((p: any) => ({ ...(p ?? empty), url }));
+      toast.success("Uploaded");
+    } catch (e: any) { toast.error(e.message ?? "Upload failed"); }
+    finally { setUploading(false); }
+  }
 
   const { data } = useQuery({
     queryKey: ["admin_gallery"],
