@@ -120,7 +120,13 @@ function MenuPage() {
                 {list.map((m: any) => (
                   <Card key={m.id} className="overflow-hidden border-border/60 transition hover:shadow-warm">
                     <div className="relative h-44 overflow-hidden bg-muted">
-                      <img src={m.image_url || (m.is_veg ? dishDosa : dishBiryani)} alt={`${m.name} — ${m.is_veg ? "veg" : "non-veg"} ${m.category || "dish"} by Pandu Catering`} className="h-full w-full object-cover" loading="lazy" />
+                      <img
+                        src={m.image_url || (m.is_veg ? dishDosa : dishBiryani)}
+                        alt={`${m.name} — ${m.is_veg ? "veg" : "non-veg"} ${m.category || "dish"} by Pandu Catering`}
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                        onError={(e) => { (e.currentTarget as HTMLImageElement).src = m.is_veg ? dishDosa : dishBiryani; }}
+                      />
                       <Badge className={`absolute left-3 top-3 ${m.is_veg ? "bg-leaf" : "bg-spice"} text-white`}>
                         {m.is_veg ? "VEG" : "NON-VEG"}
                       </Badge>
