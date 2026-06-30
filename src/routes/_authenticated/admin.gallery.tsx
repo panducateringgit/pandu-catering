@@ -10,7 +10,18 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Plus, Trash2, Pencil } from "lucide-react";
+import { Plus, Trash2, Pencil, Upload, Loader2 } from "lucide-react";
+
+const TEN_YEARS = 60 * 60 * 24 * 365 * 10;
+async function uploadGallery(file: File): Promise<string> {
+  const ext = file.name.split(".").pop() || "jpg";
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const up = await supabase.storage.from("gallery").upload(path, file, { upsert: false, contentType: file.type });
+  if (up.error) throw up.error;
+  const signed = await supabase.storage.from("gallery").createSignedUrl(path, TEN_YEARS);
+  if (signed.error || !signed.data) throw signed.error ?? new Error("Sign URL failed");
+  return signed.data.signedUrl;
+}
 
 export const Route = createFileRoute("/_authenticated/admin/gallery")({
   component: GalleryAdminPage,
@@ -21,6 +32,16 @@ const empty = { id: "", media_type: "image" as "image" | "video", url: "", capti
 function GalleryAdminPage() {
   const qc = useQueryClient();
   const [editing, setEditing] = useState<any | null>(null);
+  const [uploading, setUploading] = useState(false);
+  async function handleFile(file: File) {
+    setUploading(true);
+    try {
+      const url = await uploadGallery(file);
+      setEditing((p: any) => ({ ...(p ?? empty), url }));
+      toast.success("Uploaded");
+    } catch (e: any) { toast.error(e.message ?? "Upload failed"); }
+    finally { setUploading(false); }
+  }
 
   const { data } = useQuery({
     queryKey: ["admin_gallery"],
@@ -97,13 +118,31 @@ function GalleryAdminPage() {
                   <SelectContent><SelectItem value="image">Image</SelectItem><SelectItem value="video">Video</SelectItem></SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2"><Label>Media URL</Label><Input value={editing.url} onChange={(e) => setEditing({ ...editing, url: e.target.value })} placeholder="https://..." required /></div>
+              <div className="space-y-2">
+                <Label>Media URL</Label>
+                <div className="flex flex-wrap items-center gap-3">
+                  {editing.url && editing.media_type === "image" && (
+                    <img src={editing.url} alt="" className="h-16 w-16 rounded-md object-cover" />
+                  )}
+                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-secondary">
+                    {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                    {uploading ? "Uploading…" : "Upload file"}
+                    <input
+                      type="file"
+                      accept={editing.media_type === "video" ? "video/*" : "image/*"}
+                      className="hidden"
+                      onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.currentTarget.value = ""; }}
+                    />
+                  </label>
+                </div>
+                <Input value={editing.url} onChange={(e) => setEditing({ ...editing, url: e.target.value })} placeholder="Or paste https://..." required />
+              </div>
               <div className="space-y-2"><Label>Caption</Label><Input value={editing.caption || ""} onChange={(e) => setEditing({ ...editing, caption: e.target.value })} /></div>
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2"><Label>Sort order</Label><Input type="number" value={editing.sort_order} onChange={(e) => setEditing({ ...editing, sort_order: Number(e.target.value) })} /></div>
                 <div className="flex items-end"><label className="flex items-center gap-2"><Switch checked={editing.featured} onCheckedChange={(v) => setEditing({ ...editing, featured: v })} /> Featured</label></div>
               </div>
-              <DialogFooter><Button type="button" variant="outline" onClick={() => setEditing(null)}>Cancel</Button><Button type="submit">Save</Button></DialogFooter>
+              <DialogFooter><Button type="button" variant="outline" onClick={() => setEditing(null)}>Cancel</Button><Button type="submit" disabled={uploading}>Save</Button></DialogFooter>
             </form>
           )}
         </DialogContent>
