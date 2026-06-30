@@ -118,13 +118,31 @@ function GalleryAdminPage() {
                   <SelectContent><SelectItem value="image">Image</SelectItem><SelectItem value="video">Video</SelectItem></SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2"><Label>Media URL</Label><Input value={editing.url} onChange={(e) => setEditing({ ...editing, url: e.target.value })} placeholder="https://..." required /></div>
+              <div className="space-y-2">
+                <Label>Media URL</Label>
+                <div className="flex flex-wrap items-center gap-3">
+                  {editing.url && editing.media_type === "image" && (
+                    <img src={editing.url} alt="" className="h-16 w-16 rounded-md object-cover" />
+                  )}
+                  <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm hover:bg-secondary">
+                    {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                    {uploading ? "Uploading…" : "Upload file"}
+                    <input
+                      type="file"
+                      accept={editing.media_type === "video" ? "video/*" : "image/*"}
+                      className="hidden"
+                      onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.currentTarget.value = ""; }}
+                    />
+                  </label>
+                </div>
+                <Input value={editing.url} onChange={(e) => setEditing({ ...editing, url: e.target.value })} placeholder="Or paste https://..." required />
+              </div>
               <div className="space-y-2"><Label>Caption</Label><Input value={editing.caption || ""} onChange={(e) => setEditing({ ...editing, caption: e.target.value })} /></div>
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2"><Label>Sort order</Label><Input type="number" value={editing.sort_order} onChange={(e) => setEditing({ ...editing, sort_order: Number(e.target.value) })} /></div>
                 <div className="flex items-end"><label className="flex items-center gap-2"><Switch checked={editing.featured} onCheckedChange={(v) => setEditing({ ...editing, featured: v })} /> Featured</label></div>
               </div>
-              <DialogFooter><Button type="button" variant="outline" onClick={() => setEditing(null)}>Cancel</Button><Button type="submit">Save</Button></DialogFooter>
+              <DialogFooter><Button type="button" variant="outline" onClick={() => setEditing(null)}>Cancel</Button><Button type="submit" disabled={uploading}>Save</Button></DialogFooter>
             </form>
           )}
         </DialogContent>
