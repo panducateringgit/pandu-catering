@@ -1,0 +1,1 @@
+DELETE FROM public.bookings WHERE customer_name = 'E2E Verify';
