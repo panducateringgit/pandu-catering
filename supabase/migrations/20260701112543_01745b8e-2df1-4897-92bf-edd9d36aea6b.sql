@@ -1,0 +1,1 @@
+DELETE FROM public.bookings WHERE customer_name IN ('E2E Test','E2E Minimal','Test');

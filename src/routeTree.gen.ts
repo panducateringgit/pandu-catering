@@ -23,6 +23,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminStatusRouteImport } from './routes/_authenticated/admin.status'
 import { Route as AuthenticatedAdminSlotsRouteImport } from './routes/_authenticated/admin.slots'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated/admin.settings'
 import { Route as AuthenticatedAdminMenuRouteImport } from './routes/_authenticated/admin.menu'
@@ -99,6 +100,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminStatusRoute =
+  AuthenticatedAdminStatusRouteImport.update({
+    id: '/status',
+    path: '/status',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminSlotsRoute = AuthenticatedAdminSlotsRouteImport.update({
   id: '/slots',
   path: '/slots',
@@ -153,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/admin/menu': typeof AuthenticatedAdminMenuRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/slots': typeof AuthenticatedAdminSlotsRoute
+  '/admin/status': typeof AuthenticatedAdminStatusRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -173,6 +181,7 @@ export interface FileRoutesByTo {
   '/admin/menu': typeof AuthenticatedAdminMenuRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/admin/slots': typeof AuthenticatedAdminSlotsRoute
+  '/admin/status': typeof AuthenticatedAdminStatusRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRoutesById {
@@ -196,6 +205,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/menu': typeof AuthenticatedAdminMenuRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/admin/slots': typeof AuthenticatedAdminSlotsRoute
+  '/_authenticated/admin/status': typeof AuthenticatedAdminStatusRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -219,6 +229,7 @@ export interface FileRouteTypes {
     | '/admin/menu'
     | '/admin/settings'
     | '/admin/slots'
+    | '/admin/status'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -239,6 +250,7 @@ export interface FileRouteTypes {
     | '/admin/menu'
     | '/admin/settings'
     | '/admin/slots'
+    | '/admin/status'
     | '/admin'
   id:
     | '__root__'
@@ -261,6 +273,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/menu'
     | '/_authenticated/admin/settings'
     | '/_authenticated/admin/slots'
+    | '/_authenticated/admin/status'
     | '/_authenticated/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -379,6 +392,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/status': {
+      id: '/_authenticated/admin/status'
+      path: '/status'
+      fullPath: '/admin/status'
+      preLoaderRoute: typeof AuthenticatedAdminStatusRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/slots': {
       id: '/_authenticated/admin/slots'
       path: '/slots'
@@ -431,6 +451,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminMenuRoute: typeof AuthenticatedAdminMenuRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminSlotsRoute: typeof AuthenticatedAdminSlotsRoute
+  AuthenticatedAdminStatusRoute: typeof AuthenticatedAdminStatusRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
 }
 
@@ -441,6 +462,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminMenuRoute: AuthenticatedAdminMenuRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminSlotsRoute: AuthenticatedAdminSlotsRoute,
+  AuthenticatedAdminStatusRoute: AuthenticatedAdminStatusRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
 }
 
