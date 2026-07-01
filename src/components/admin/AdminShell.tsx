@@ -5,7 +5,7 @@ import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard, CalendarDays, ClipboardList, UtensilsCrossed, Images,
-  Settings, Sparkles, LogOut, ChefHat, ExternalLink,
+  Settings, Sparkles, LogOut, ChefHat, ExternalLink, Activity,
 } from "lucide-react";
 
 const NAV = [
@@ -16,6 +16,7 @@ const NAV = [
   { to: "/_authenticated/admin/events", label: "Event Types", icon: Sparkles },
   { to: "/_authenticated/admin/gallery", label: "Gallery", icon: Images },
   { to: "/_authenticated/admin/settings", label: "Site Settings", icon: Settings },
+  { to: "/_authenticated/admin/status", label: "Status", icon: Activity },
 ];
 
 export function AdminShell() {

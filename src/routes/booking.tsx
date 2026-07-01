@@ -141,14 +141,21 @@ function BookingPage() {
         throw new Error(`Capacity exceeded for ${parsed.data.slot_date}. Try another date or call ${BRAND.phoneDisplay}.`);
       }
       const noteSuffix = `\n[Service: ${form.service_type}]${form.menu_preferences ? `\n[Menu prefs: ${form.menu_preferences}]` : ""}`;
+      const newId =
+        typeof crypto !== "undefined" && "randomUUID" in crypto
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
       const payload = {
+        id: newId,
         ...parsed.data,
         email: parsed.data.email || null,
         notes: (parsed.data.notes || "") + noteSuffix,
       };
-      const { data, error } = await supabase.from("bookings").insert(payload).select("id").single();
+      // Insert with return=minimal — anon has no SELECT policy on bookings,
+      // so INSERT ... RETURNING would fail RLS. We supply the id client-side.
+      const { error } = await supabase.from("bookings").insert(payload);
       if (error) throw error;
-      return data;
+      return { id: newId };
     },
     onSuccess: (data) => {
       setBookingId(data.id);
