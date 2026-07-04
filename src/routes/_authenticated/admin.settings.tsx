@@ -29,6 +29,7 @@ const FIELDS: { key: string; label: string; type?: "text" | "textarea" | "url"; 
   { key: "social_instagram", label: "Instagram URL" },
   { key: "social_facebook", label: "Facebook URL" },
   { key: "social_youtube", label: "YouTube URL" },
+  { key: "ga_measurement_id", label: "Google Analytics 4 Measurement ID", help: "e.g. G-XXXXXXXXXX. Leave blank to disable tracking." },
 ];
 
 function SettingsAdminPage() {
