@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { BRAND, EVENT_TYPE_OPTIONS, SERVICE_OPTIONS, telLink, waLink } from "@/lib/constants";
 import { useSettings } from "@/hooks/useSettings";
+import { trackEvent } from "@/components/Analytics";
 import { CalendarCheck, MessageCircle, Phone, CheckCircle2, AlertTriangle, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/booking")({
@@ -162,6 +163,12 @@ function BookingPage() {
       setShowSuccess(true);
       qc.invalidateQueries({ queryKey: ["slots_public"] });
       qc.invalidateQueries({ queryKey: ["day_load"] });
+      trackEvent("booking_submitted", {
+        event_type: form.event_type,
+        guest_count: form.guest_count,
+        service_type: form.service_type,
+        veg_pref: form.veg_pref,
+      });
       toast.success("Booking request received!");
     },
     onError: (e: any) => toast.error(e.message || "Could not submit booking"),

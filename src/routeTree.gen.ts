@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VegRouteImport } from './routes/veg'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as NonVegRouteImport } from './routes/non-veg'
 import { Route as MenuRouteImport } from './routes/menu'
 import { Route as GalleryRouteImport } from './routes/gallery'
@@ -36,9 +38,19 @@ const VegRoute = VegRouteImport.update({
   path: '/veg',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NonVegRoute = NonVegRouteImport.update({
@@ -150,7 +162,9 @@ export interface FileRoutesByFullPath {
   '/gallery': typeof GalleryRoute
   '/menu': typeof MenuRoute
   '/non-veg': typeof NonVegRoute
+  '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/veg': typeof VegRoute
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
@@ -172,7 +186,9 @@ export interface FileRoutesByTo {
   '/gallery': typeof GalleryRoute
   '/menu': typeof MenuRoute
   '/non-veg': typeof NonVegRoute
+  '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/veg': typeof VegRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/bookings': typeof AuthenticatedAdminBookingsRoute
@@ -195,7 +211,9 @@ export interface FileRoutesById {
   '/gallery': typeof GalleryRoute
   '/menu': typeof MenuRoute
   '/non-veg': typeof NonVegRoute
+  '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/veg': typeof VegRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
@@ -219,7 +237,9 @@ export interface FileRouteTypes {
     | '/gallery'
     | '/menu'
     | '/non-veg'
+    | '/privacy'
     | '/sitemap.xml'
+    | '/terms'
     | '/veg'
     | '/admin'
     | '/admin/login'
@@ -241,7 +261,9 @@ export interface FileRouteTypes {
     | '/gallery'
     | '/menu'
     | '/non-veg'
+    | '/privacy'
     | '/sitemap.xml'
+    | '/terms'
     | '/veg'
     | '/admin/login'
     | '/admin/bookings'
@@ -263,7 +285,9 @@ export interface FileRouteTypes {
     | '/gallery'
     | '/menu'
     | '/non-veg'
+    | '/privacy'
     | '/sitemap.xml'
+    | '/terms'
     | '/veg'
     | '/_authenticated/admin'
     | '/admin/login'
@@ -287,7 +311,9 @@ export interface RootRouteChildren {
   GalleryRoute: typeof GalleryRoute
   MenuRoute: typeof MenuRoute
   NonVegRoute: typeof NonVegRoute
+  PrivacyRoute: typeof PrivacyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TermsRoute: typeof TermsRoute
   VegRoute: typeof VegRoute
   AdminLoginRoute: typeof AdminLoginRoute
 }
@@ -301,11 +327,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VegRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/non-veg': {
@@ -490,7 +530,9 @@ const rootRouteChildren: RootRouteChildren = {
   GalleryRoute: GalleryRoute,
   MenuRoute: MenuRoute,
   NonVegRoute: NonVegRoute,
+  PrivacyRoute: PrivacyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TermsRoute: TermsRoute,
   VegRoute: VegRoute,
   AdminLoginRoute: AdminLoginRoute,
 }
