@@ -63,7 +63,11 @@ export function SiteFooter() {
 
         <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-sidebar-border pt-6 text-xs text-sidebar-foreground/70 md:flex-row">
           <p>© {new Date().getFullYear()} {BRAND.name}. All rights reserved.</p>
-          <p><Link to="/auth" className="hover:text-turmeric">Admin</Link></p>
+          <div className="flex flex-wrap items-center gap-4">
+            <Link to="/privacy" className="hover:text-turmeric">Privacy Policy</Link>
+            <Link to="/terms" className="hover:text-turmeric">Terms</Link>
+            <Link to="/auth" className="hover:text-turmeric">Admin</Link>
+          </div>
         </div>
       </div>
     </footer>

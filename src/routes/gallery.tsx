@@ -2,10 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { PublicLayout } from "@/components/PublicLayout";
 import { supabase } from "@/integrations/supabase/client";
-import heroFeast from "@/assets/hero-feast.jpg";
-import dishBiryani from "@/assets/dish-biryani.jpg";
-import dishDosa from "@/assets/dish-dosa.jpg";
-import eventWedding from "@/assets/event-wedding.jpg";
+import heroFeastAsset from "@/assets/hero-feast.jpg.asset.json";
+const heroFeast = heroFeastAsset.url;
+import dishBiryaniAsset from "@/assets/dish-biryani.jpg.asset.json";
+const dishBiryani = dishBiryaniAsset.url;
+import dishDosaAsset from "@/assets/dish-dosa.jpg.asset.json";
+const dishDosa = dishDosaAsset.url;
+import eventWeddingAsset from "@/assets/event-wedding.jpg.asset.json";
+const eventWedding = eventWeddingAsset.url;
 
 export const Route = createFileRoute("/gallery")({
   head: () => ({
