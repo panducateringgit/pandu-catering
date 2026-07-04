@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { orderWaLink } from "@/lib/constants";
 import { MessageCircle, Leaf, CheckCircle2 } from "lucide-react";
-import dishDosa from "@/assets/dish-dosa.jpg";
+import dishDosaAsset from "@/assets/dish-dosa.jpg.asset.json";
+const dishDosa = dishDosaAsset.url;
 
 export const Route = createFileRoute("/veg")({
   head: () => ({

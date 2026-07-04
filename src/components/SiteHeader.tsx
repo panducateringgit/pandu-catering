@@ -3,7 +3,8 @@ import { useState } from "react";
 import { Menu, X, Phone, MessageCircle } from "lucide-react";
 import { BRAND, telLink, orderWaLink } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
-import logo from "@/assets/pandu-logo.png";
+import logoAsset from "@/assets/pandu-logo.png.asset.json";
+const logo = logoAsset.url;
 
 const NAV = [
   { to: "/", label: "Home" },

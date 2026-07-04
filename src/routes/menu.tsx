@@ -11,8 +11,10 @@ import { Input } from "@/components/ui/input";
 import { MENU_CATEGORIES } from "@/lib/constants";
 import { waLink } from "@/lib/constants";
 import { MessageCircle, Search } from "lucide-react";
-import dishBiryani from "@/assets/dish-biryani.jpg";
-import dishDosa from "@/assets/dish-dosa.jpg";
+import dishBiryaniAsset from "@/assets/dish-biryani.jpg.asset.json";
+const dishBiryani = dishBiryaniAsset.url;
+import dishDosaAsset from "@/assets/dish-dosa.jpg.asset.json";
+const dishDosa = dishDosaAsset.url;
 
 export const Route = createFileRoute("/menu")({
   head: () => ({

@@ -19,10 +19,14 @@ import {
   Cake, Briefcase, Home as HomeIcon, Heart, Crown, Star, ChevronRight,
   ShieldCheck, MapPin, FileCheck2, Leaf, CheckCircle2, ExternalLink,
 } from "lucide-react";
-import heroFeast from "@/assets/hero-feast.jpg";
-import dishBiryani from "@/assets/dish-biryani.jpg";
-import dishDosa from "@/assets/dish-dosa.jpg";
-import eventWedding from "@/assets/event-wedding.jpg";
+import heroFeastAsset from "@/assets/hero-feast.jpg.asset.json";
+const heroFeast = heroFeastAsset.url;
+import dishBiryaniAsset from "@/assets/dish-biryani.jpg.asset.json";
+const dishBiryani = dishBiryaniAsset.url;
+import dishDosaAsset from "@/assets/dish-dosa.jpg.asset.json";
+const dishDosa = dishDosaAsset.url;
+import eventWeddingAsset from "@/assets/event-wedding.jpg.asset.json";
+const eventWedding = eventWeddingAsset.url;
 
 const JSONLD = {
   "@context": "https://schema.org",

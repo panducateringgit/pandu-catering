@@ -3,7 +3,8 @@ import { PublicLayout } from "@/components/PublicLayout";
 import { useSettings } from "@/hooks/useSettings";
 import { Award, Heart, Soup, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import heroFeast from "@/assets/hero-feast.jpg";
+import heroFeastAsset from "@/assets/hero-feast.jpg.asset.json";
+const heroFeast = heroFeastAsset.url;
 
 export const Route = createFileRoute("/about")({
   head: () => ({
