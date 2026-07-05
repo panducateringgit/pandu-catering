@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useSettings } from "@/hooks/useSettings";
+import { useConsent } from "@/components/CookieConsent";
 
 declare global {
   interface Window {
@@ -9,16 +10,19 @@ declare global {
 }
 
 /**
- * Injects Google Analytics 4 only when a Measurement ID is set in Site Settings
- * (admin/settings → "Google Analytics 4 Measurement ID"). Skipped in the editor
- * preview iframe so dev traffic doesn't pollute stats.
+ * Injects Google Analytics 4 only when:
+ *  - a Measurement ID is set in Site Settings, AND
+ *  - the visitor has granted consent via the cookie banner.
+ * Skipped in the editor preview iframe so dev traffic doesn't pollute stats.
  */
 export function Analytics() {
   const { data: settings } = useSettings();
   const id = settings?.ga_measurement_id?.trim();
+  const consent = useConsent();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (consent !== "granted") return;
     if (!id || !/^G-[A-Z0-9]{6,}$/i.test(id)) return;
     // Skip in the Lovable editor preview iframe.
     if (window.location.hostname.includes("lovable.app") && window.self !== window.top) return;
@@ -34,7 +38,7 @@ export function Analytics() {
     window.gtag = function gtag() { window.dataLayer!.push(arguments); };
     window.gtag("js", new Date());
     window.gtag("config", id, { anonymize_ip: true });
-  }, [id]);
+  }, [id, consent]);
 
   return null;
 }
@@ -44,3 +48,4 @@ export function trackEvent(name: string, params?: Record<string, any>) {
   if (typeof window === "undefined" || typeof window.gtag !== "function") return;
   try { window.gtag("event", name, params ?? {}); } catch { /* noop */ }
 }
+
