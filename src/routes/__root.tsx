@@ -123,6 +123,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <Analytics />
       <Outlet />
+      <CookieConsent />
       <Toaster richColors position="top-center" />
     </QueryClientProvider>
   );
