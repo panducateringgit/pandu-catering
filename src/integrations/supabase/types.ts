@@ -189,6 +189,7 @@ export type Database = {
           featured: boolean
           id: string
           media_type: string
+          published: boolean
           sort_order: number
           url: string
         }
@@ -198,6 +199,7 @@ export type Database = {
           featured?: boolean
           id?: string
           media_type?: string
+          published?: boolean
           sort_order?: number
           url: string
         }
@@ -207,6 +209,7 @@ export type Database = {
           featured?: boolean
           id?: string
           media_type?: string
+          published?: boolean
           sort_order?: number
           url?: string
         }
