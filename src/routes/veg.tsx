@@ -48,6 +48,7 @@ export function CategoryPage({ isVeg }: { isVeg: boolean }) {
       const { data } = await supabase
         .from("gallery_media")
         .select("*")
+        .eq("published", true)
         .order("sort_order")
         .limit(6);
       return data ?? [];

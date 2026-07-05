@@ -103,7 +103,7 @@ function HomePage() {
   const { data: gallery } = useQuery({
     queryKey: ["gallery_home"],
     queryFn: async () => {
-      const { data } = await supabase.from("gallery_media").select("*").order("sort_order").limit(8);
+      const { data } = await supabase.from("gallery_media").select("*").eq("published", true).order("sort_order").limit(8);
       return data ?? [];
     },
   });
