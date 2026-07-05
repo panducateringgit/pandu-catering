@@ -27,7 +27,7 @@ function GalleryPage() {
   const { data } = useQuery({
     queryKey: ["gallery_all"],
     queryFn: async () => {
-      const { data } = await supabase.from("gallery_media").select("*").order("sort_order");
+      const { data } = await supabase.from("gallery_media").select("*").eq("published", true).order("sort_order");
       return data ?? [];
     },
   });
