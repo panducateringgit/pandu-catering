@@ -86,6 +86,10 @@ function GalleryAdminPage() {
 
   const save = useMutation({
     mutationFn: async (item: Media) => {
+      if (item.media_type === "image" && item.url) {
+        const check = await validateImageUrl(item.url);
+        if (!check.ok) throw new Error(`Image URL invalid: ${check.reason}`);
+      }
       const payload = { ...item, sort_order: Number(item.sort_order) };
       if (item.id) {
         const { id, ...rest } = payload;
