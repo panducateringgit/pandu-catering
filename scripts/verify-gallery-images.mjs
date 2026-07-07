@@ -13,7 +13,7 @@
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
-const SITE_URL = (process.env.SITE_URL || "https://pandu-catering.lovable.app").replace(/\/$/, "");
+const SITE_URL = (process.env.SITE_URL || "https://www.panducatering.in").replace(/\/$/, "");
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   console.error("Missing SUPABASE_URL or SUPABASE_ANON_KEY env vars.");
