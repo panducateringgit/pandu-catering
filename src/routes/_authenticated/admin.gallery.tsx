@@ -322,3 +322,36 @@ function SortableCard({
     </Card>
   );
 }
+
+function UrlValidatedInput({
+  value,
+  mediaType,
+  onChange,
+}: {
+  value: string;
+  mediaType: "image" | "video";
+  onChange: (v: string) => void;
+}) {
+  const [check, setCheck] = useState<{ status: "idle" | "checking" | "ok" | "bad"; reason?: string }>({ status: "idle" });
+  return (
+    <div className="space-y-1">
+      <Input
+        value={value}
+        onChange={(e) => { onChange(e.target.value); setCheck({ status: "idle" }); }}
+        onBlur={async (e) => {
+          const v = e.target.value.trim();
+          if (!v || mediaType !== "image") return;
+          setCheck({ status: "checking" });
+          const r = await validateImageUrl(v);
+          setCheck(r.ok ? { status: "ok" } : { status: "bad", reason: r.reason });
+        }}
+        placeholder="Or paste https://..."
+        required
+      />
+      {check.status === "checking" && <p className="flex items-center gap-1 text-xs text-muted-foreground"><Loader2 className="h-3 w-3 animate-spin" /> Checking image…</p>}
+      {check.status === "ok" && <p className="flex items-center gap-1 text-xs text-leaf"><CheckCircle2 className="h-3 w-3" /> Image loads OK</p>}
+      {check.status === "bad" && <p className="flex items-center gap-1 text-xs text-destructive"><XCircle className="h-3 w-3" /> {check.reason}</p>}
+    </div>
+  );
+}
+
