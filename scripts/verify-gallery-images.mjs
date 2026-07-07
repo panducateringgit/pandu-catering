@@ -11,13 +11,18 @@
  *   SITE_URL          - base URL for resolving relative /assets/... paths
  *   TIMEOUT_MS        - per-request timeout (default 10000)
  *   RETRIES           - retry attempts per URL on network/5xx (default 2)
+ *   REPORT_PATH       - optional path to write JSON + CSV report of results
  */
+
+import { writeFileSync, mkdirSync } from "node:fs";
+import { dirname } from "node:path";
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 const SITE_URL = (process.env.SITE_URL || "https://www.panducatering.in").replace(/\/$/, "");
 const TIMEOUT_MS = Number(process.env.TIMEOUT_MS || 10000);
 const RETRIES = Number(process.env.RETRIES || 2);
+const REPORT_PATH = process.env.REPORT_PATH || "";
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   console.error("Missing SUPABASE_URL or SUPABASE_ANON_KEY env vars.");
@@ -105,6 +110,44 @@ for (const r of results) {
   );
 }
 
+if (REPORT_PATH) {
+  const dir = dirname(REPORT_PATH);
+  if (dir && dir !== ".") mkdirSync(dir, { recursive: true });
+  const summary = {
+    site_url: SITE_URL,
+    generated_at: new Date().toISOString(),
+    total: results.length,
+    ok: results.length - broken.length,
+    failed: broken.length,
+    results: results.map((r) => ({
+      source: r.target.source,
+      id: r.target.id,
+      label: r.target.label,
+      url: r.url,
+      status: r.status,
+      ok: r.ok,
+      attempts: r.attempts,
+      error: r.error ?? null,
+    })),
+  };
+  writeFileSync(REPORT_PATH, JSON.stringify(summary, null, 2));
+  const csvPath = REPORT_PATH.replace(/\.json$/i, "") + ".failed.csv";
+  const csvRows = [
+    "source,id,status,attempts,url,label,error",
+    ...broken.map((b) => [
+      b.target.source,
+      b.target.id,
+      b.status || "ERR",
+      b.attempts,
+      b.url,
+      JSON.stringify(b.target.label || ""),
+      JSON.stringify(b.error || ""),
+    ].join(",")),
+  ];
+  writeFileSync(csvPath, csvRows.join("\n"));
+  console.log(`\nReport written to ${REPORT_PATH} (+ ${csvPath})`);
+}
+
 if (broken.length) {
   console.error(`\n${broken.length} of ${results.length} URL(s) failed to load:`);
   for (const b of broken) {
@@ -116,3 +159,4 @@ if (broken.length) {
   process.exit(1);
 }
 console.log(`\nAll ${results.length} URL(s) resolve successfully.`);
+

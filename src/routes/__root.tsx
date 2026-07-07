@@ -57,15 +57,16 @@ async function loadBrandAssets() {
     const { data } = await supabase
       .from("site_settings")
       .select("key,value")
-      .in("key", ["logo_url", "favicon_url"]);
+      .in("key", ["logo_url", "favicon_url", "gsc_verification"]);
     const map: Record<string, string> = {};
     for (const r of data ?? []) map[(r as any).key] = (r as any).value ?? "";
     return {
       logoUrl: map.logo_url || "/assets/pandu-logo.png",
       faviconUrl: map.favicon_url || map.logo_url || "/assets/pandu-logo.png",
+      gscToken: (map.gsc_verification || "").trim(),
     };
   } catch {
-    return { logoUrl: "/assets/pandu-logo.png", faviconUrl: "/assets/pandu-logo.png" };
+    return { logoUrl: "/assets/pandu-logo.png", faviconUrl: "/assets/pandu-logo.png", gscToken: "" };
   }
 }
 
@@ -74,6 +75,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: ({ loaderData }) => {
     const logo = loaderData?.logoUrl ?? "/assets/pandu-logo.png";
     const favicon = loaderData?.faviconUrl ?? logo;
+    const gscToken = loaderData?.gscToken ?? "";
     const faviconType = favicon.endsWith(".svg")
       ? "image/svg+xml"
       : favicon.endsWith(".ico")
@@ -81,8 +83,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         : favicon.endsWith(".png")
           ? "image/png"
           : "image/*";
-    return {
-    meta: [
+    const meta: Array<Record<string, string>> = [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "theme-color", content: "#6e1d1d" },
@@ -91,9 +92,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7f38d4be-75a6-4b50-88b3-b3d2d5a86603/id-preview-0cf1c1d1--c9e8672b-2af6-4a72-872b-cfb240981814.lovable.app-1782115346618.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/7f38d4be-75a6-4b50-88b3-b3d2d5a86603/id-preview-0cf1c1d1--c9e8672b-2af6-4a72-872b-cfb240981814.lovable.app-1782115346618.png" },
-      // TODO: Replace REPLACE_WITH_GSC_TOKEN with the verification string from Google Search Console once the property is added.
-      { name: "google-site-verification", content: "REPLACE_WITH_GSC_TOKEN" },
-    ],
+    ];
+    if (gscToken) meta.push({ name: "google-site-verification", content: gscToken });
+    return {
+    meta,
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "icon", type: faviconType, href: favicon },

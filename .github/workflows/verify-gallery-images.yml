@@ -27,10 +27,20 @@ jobs:
         with:
           node-version: "20"
       - name: Verify referenced media URLs resolve
+        id: verify
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://fobhqgbqrlmstcbkvynh.supabase.co' }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
           SITE_URL: ${{ secrets.SITE_URL || 'https://www.panducatering.in' }}
           TIMEOUT_MS: "10000"
           RETRIES: "2"
+          REPORT_PATH: "verify-report/report.json"
         run: node scripts/verify-gallery-images.mjs
+      - name: Upload verification report
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: media-url-verification-report
+          path: verify-report/
+          if-no-files-found: warn
+          retention-days: 30

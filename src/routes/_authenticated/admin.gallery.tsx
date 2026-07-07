@@ -27,8 +27,9 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Plus, Trash2, Pencil, Upload, Loader2, GripVertical, Eye, EyeOff } from "lucide-react";
+import { Plus, Trash2, Pencil, Upload, Loader2, GripVertical, Eye, EyeOff, CheckCircle2, XCircle } from "lucide-react";
 import { CropDialog } from "@/components/admin/CropDialog";
+import { validateImageUrl } from "@/lib/validate-image-url";
 
 const TEN_YEARS = 60 * 60 * 24 * 365 * 10;
 
@@ -85,6 +86,10 @@ function GalleryAdminPage() {
 
   const save = useMutation({
     mutationFn: async (item: Media) => {
+      if (item.media_type === "image" && item.url) {
+        const check = await validateImageUrl(item.url);
+        if (!check.ok) throw new Error(`Image URL invalid: ${check.reason}`);
+      }
       const payload = { ...item, sort_order: Number(item.sort_order) };
       if (item.id) {
         const { id, ...rest } = payload;
@@ -237,7 +242,12 @@ function GalleryAdminPage() {
                     />
                   </label>
                 </div>
-                <Input value={editing.url} onChange={(e) => setEditing({ ...editing, url: e.target.value })} placeholder="Or paste https://..." required />
+                <UrlValidatedInput
+                  value={editing.url}
+                  mediaType={editing.media_type}
+                  onChange={(v) => setEditing({ ...editing, url: v })}
+                />
+
               </div>
               <div className="space-y-2"><Label>Caption</Label><Input value={editing.caption || ""} onChange={(e) => setEditing({ ...editing, caption: e.target.value })} /></div>
               <div className="grid gap-4 md:grid-cols-3">
@@ -312,3 +322,36 @@ function SortableCard({
     </Card>
   );
 }
+
+function UrlValidatedInput({
+  value,
+  mediaType,
+  onChange,
+}: {
+  value: string;
+  mediaType: "image" | "video";
+  onChange: (v: string) => void;
+}) {
+  const [check, setCheck] = useState<{ status: "idle" | "checking" | "ok" | "bad"; reason?: string }>({ status: "idle" });
+  return (
+    <div className="space-y-1">
+      <Input
+        value={value}
+        onChange={(e) => { onChange(e.target.value); setCheck({ status: "idle" }); }}
+        onBlur={async (e) => {
+          const v = e.target.value.trim();
+          if (!v || mediaType !== "image") return;
+          setCheck({ status: "checking" });
+          const r = await validateImageUrl(v);
+          setCheck(r.ok ? { status: "ok" } : { status: "bad", reason: r.reason });
+        }}
+        placeholder="Or paste https://..."
+        required
+      />
+      {check.status === "checking" && <p className="flex items-center gap-1 text-xs text-muted-foreground"><Loader2 className="h-3 w-3 animate-spin" /> Checking image…</p>}
+      {check.status === "ok" && <p className="flex items-center gap-1 text-xs text-leaf"><CheckCircle2 className="h-3 w-3" /> Image loads OK</p>}
+      {check.status === "bad" && <p className="flex items-center gap-1 text-xs text-destructive"><XCircle className="h-3 w-3" /> {check.reason}</p>}
+    </div>
+  );
+}
+
