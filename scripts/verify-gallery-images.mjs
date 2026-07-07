@@ -110,6 +110,44 @@ for (const r of results) {
   );
 }
 
+if (REPORT_PATH) {
+  const dir = dirname(REPORT_PATH);
+  if (dir && dir !== ".") mkdirSync(dir, { recursive: true });
+  const summary = {
+    site_url: SITE_URL,
+    generated_at: new Date().toISOString(),
+    total: results.length,
+    ok: results.length - broken.length,
+    failed: broken.length,
+    results: results.map((r) => ({
+      source: r.target.source,
+      id: r.target.id,
+      label: r.target.label,
+      url: r.url,
+      status: r.status,
+      ok: r.ok,
+      attempts: r.attempts,
+      error: r.error ?? null,
+    })),
+  };
+  writeFileSync(REPORT_PATH, JSON.stringify(summary, null, 2));
+  const csvPath = REPORT_PATH.replace(/\.json$/i, "") + ".failed.csv";
+  const csvRows = [
+    "source,id,status,attempts,url,label,error",
+    ...broken.map((b) => [
+      b.target.source,
+      b.target.id,
+      b.status || "ERR",
+      b.attempts,
+      b.url,
+      JSON.stringify(b.target.label || ""),
+      JSON.stringify(b.error || ""),
+    ].join(",")),
+  ];
+  writeFileSync(csvPath, csvRows.join("\n"));
+  console.log(`\nReport written to ${REPORT_PATH} (+ ${csvPath})`);
+}
+
 if (broken.length) {
   console.error(`\n${broken.length} of ${results.length} URL(s) failed to load:`);
   for (const b of broken) {
@@ -121,3 +159,4 @@ if (broken.length) {
   process.exit(1);
 }
 console.log(`\nAll ${results.length} URL(s) resolve successfully.`);
+
