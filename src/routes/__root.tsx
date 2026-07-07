@@ -52,8 +52,36 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+async function loadBrandAssets() {
+  try {
+    const { data } = await supabase
+      .from("site_settings")
+      .select("key,value")
+      .in("key", ["logo_url", "favicon_url"]);
+    const map: Record<string, string> = {};
+    for (const r of data ?? []) map[(r as any).key] = (r as any).value ?? "";
+    return {
+      logoUrl: map.logo_url || "/assets/pandu-logo.png",
+      faviconUrl: map.favicon_url || map.logo_url || "/assets/pandu-logo.png",
+    };
+  } catch {
+    return { logoUrl: "/assets/pandu-logo.png", faviconUrl: "/assets/pandu-logo.png" };
+  }
+}
+
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  head: () => ({
+  loader: loadBrandAssets,
+  head: ({ loaderData }) => {
+    const logo = loaderData?.logoUrl ?? "/assets/pandu-logo.png";
+    const favicon = loaderData?.faviconUrl ?? logo;
+    const faviconType = favicon.endsWith(".svg")
+      ? "image/svg+xml"
+      : favicon.endsWith(".ico")
+        ? "image/x-icon"
+        : favicon.endsWith(".png")
+          ? "image/png"
+          : "image/*";
+    return {
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
@@ -68,8 +96,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", type: "image/png", href: "/assets/pandu-logo.png" },
-      { rel: "apple-touch-icon", href: "/assets/pandu-logo.png" },
+      { rel: "icon", type: faviconType, href: favicon },
+      { rel: "apple-touch-icon", href: logo },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" },
@@ -80,21 +108,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         "@context": "https://schema.org",
         "@type": "Organization",
         name: "Pandu Catering",
-        url: "https://pandu-catering.lovable.app",
-        logo: "https://pandu-catering.lovable.app/og.jpg",
+        url: "https://www.panducatering.in",
+        logo: logo.startsWith("http") ? logo : `https://www.panducatering.in${logo}`,
         sameAs: [
           "https://www.instagram.com/pandu_catering",
           "https://www.facebook.com/pandu.catering",
         ],
       }),
     }],
-  }),
+    };
+  },
 
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
   errorComponent: ErrorComponent,
 });
+
 
 function RootShell({ children }: { children: ReactNode }) {
   return (

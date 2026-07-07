@@ -17,9 +17,9 @@ export const Route = createFileRoute("/veg")({
       { name: "description", content: "100% pure veg catering in Hyderabad. South Indian, North Indian & Chinese veg menus from ₹80/plate. Wedding, birthday & corporate catering — order on WhatsApp." },
       { property: "og:title", content: "Pure Veg Catering — Pandu Catering, Hyderabad" },
       { property: "og:description", content: "Authentic 100% vegetarian catering across Hyderabad. Order on WhatsApp." },
-      { property: "og:url", content: "https://pandu-catering.lovable.app/veg" },
+      { property: "og:url", content: "https://www.panducatering.in/veg" },
     ],
-    links: [{ rel: "canonical", href: "https://pandu-catering.lovable.app/veg" }],
+    links: [{ rel: "canonical", href: "https://www.panducatering.in/veg" }],
   }),
   component: () => <CategoryPage isVeg />,
 });

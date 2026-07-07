@@ -1,12 +1,15 @@
-name: Verify gallery image URLs
+name: Verify site media URLs
 
-# Runs after each deploy (push to main), on a daily schedule, and on demand.
-# Fetches every published gallery_media URL from the database and asserts each
-# one resolves with HTTP 200. Fails the workflow (and surfaces a red check on
-# the commit / PR) if any image is broken.
+# Runs after each deploy (push to main), on pull requests (so broken image
+# URLs are caught before merging), on successful deployment_status events,
+# on a daily schedule, and on demand. Fetches every referenced media URL
+# (gallery_media, menu_items images, site_settings hero/logo/favicon) and
+# asserts each resolves with HTTP 200.
 
 on:
   push:
+    branches: [main]
+  pull_request:
     branches: [main]
   deployment_status:
   schedule:
@@ -23,9 +26,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - name: Verify published gallery URLs resolve
+      - name: Verify referenced media URLs resolve
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://fobhqgbqrlmstcbkvynh.supabase.co' }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-          SITE_URL: ${{ secrets.SITE_URL || 'https://pandu-catering.lovable.app' }}
+          SITE_URL: ${{ secrets.SITE_URL || 'https://www.panducatering.in' }}
+          TIMEOUT_MS: "10000"
+          RETRIES: "2"
         run: node scripts/verify-gallery-images.mjs
