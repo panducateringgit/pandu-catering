@@ -242,7 +242,12 @@ function GalleryAdminPage() {
                     />
                   </label>
                 </div>
-                <Input value={editing.url} onChange={(e) => setEditing({ ...editing, url: e.target.value })} placeholder="Or paste https://..." required />
+                <UrlValidatedInput
+                  value={editing.url}
+                  mediaType={editing.media_type}
+                  onChange={(v) => setEditing({ ...editing, url: v })}
+                />
+
               </div>
               <div className="space-y-2"><Label>Caption</Label><Input value={editing.caption || ""} onChange={(e) => setEditing({ ...editing, caption: e.target.value })} /></div>
               <div className="grid gap-4 md:grid-cols-3">
