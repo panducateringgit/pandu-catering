@@ -17,6 +17,7 @@ export const Route = createFileRoute("/_authenticated/admin/settings")({
 const FIELDS: { key: string; label: string; type?: "text" | "textarea" | "url" | "image"; help?: string }[] = [
   { key: "logo_url", label: "Site logo", type: "image", help: "Shown in the header and used as the browser tab icon fallback." },
   { key: "favicon_url", label: "Favicon (browser tab icon)", type: "image", help: "Square PNG/SVG/ICO. Falls back to the logo if empty." },
+  { key: "gsc_verification", label: "Google Search Console verification token", help: "Paste the meta-tag content value from Search Console. Auto-populates the google-site-verification tag." },
   { key: "hero_title", label: "Homepage hero headline" },
   { key: "hero_subtitle", label: "Homepage hero subtitle", type: "textarea" },
   { key: "hero_video_url", label: "Hero video URL (optional)", type: "url" },
