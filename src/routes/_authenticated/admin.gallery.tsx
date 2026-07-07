@@ -27,8 +27,9 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Plus, Trash2, Pencil, Upload, Loader2, GripVertical, Eye, EyeOff } from "lucide-react";
+import { Plus, Trash2, Pencil, Upload, Loader2, GripVertical, Eye, EyeOff, CheckCircle2, XCircle } from "lucide-react";
 import { CropDialog } from "@/components/admin/CropDialog";
+import { validateImageUrl } from "@/lib/validate-image-url";
 
 const TEN_YEARS = 60 * 60 * 24 * 365 * 10;
 
