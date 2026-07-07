@@ -13,7 +13,8 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { MENU_CATEGORIES } from "@/lib/constants";
 import { toast } from "sonner";
-import { Plus, Trash2, Pencil, ArrowUp, ArrowDown, Upload, Loader2 } from "lucide-react";
+import { Plus, Trash2, Pencil, ArrowUp, ArrowDown, Upload, Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { validateImageUrl } from "@/lib/validate-image-url";
 
 export const Route = createFileRoute("/_authenticated/admin/menu")({
   component: MenuAdminPage,
@@ -38,6 +39,7 @@ function MenuAdminPage() {
   const [filterCat, setFilterCat] = useState<string>("All");
   const [uploading, setUploading] = useState(false);
   const [customCat, setCustomCat] = useState("");
+  const [imgCheck, setImgCheck] = useState<{ status: "idle" | "checking" | "ok" | "bad"; reason?: string }>({ status: "idle" });
 
   const { data } = useQuery({
     queryKey: ["admin_menu"],
@@ -61,6 +63,15 @@ function MenuAdminPage() {
 
   const save = useMutation({
     mutationFn: async (item: any) => {
+      if (item.image_url && item.image_url.trim()) {
+        setImgCheck({ status: "checking" });
+        const check = await validateImageUrl(item.image_url);
+        if (!check.ok) {
+          setImgCheck({ status: "bad", reason: check.reason });
+          throw new Error(`Image URL invalid: ${check.reason}`);
+        }
+        setImgCheck({ status: "ok" });
+      }
       const payload = { ...item, price: Number(item.price), sort_order: Number(item.sort_order) };
       if (item.id) {
         const { id, ...rest } = payload;
@@ -72,7 +83,7 @@ function MenuAdminPage() {
         if (error) throw error;
       }
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin_menu"] }); setEditing(null); toast.success("Saved"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin_menu"] }); setEditing(null); setImgCheck({ status: "idle" }); toast.success("Saved"); },
     onError: (e: any) => toast.error(e.message),
   });
 
@@ -245,7 +256,21 @@ function MenuAdminPage() {
                     />
                   </label>
                 </div>
-                <Input value={editing.image_url || ""} onChange={(e) => setEditing({ ...editing, image_url: e.target.value })} placeholder="Or paste image URL" />
+                <Input
+                  value={editing.image_url || ""}
+                  onChange={(e) => { setEditing({ ...editing, image_url: e.target.value }); setImgCheck({ status: "idle" }); }}
+                  onBlur={async (e) => {
+                    const v = e.target.value.trim();
+                    if (!v) return setImgCheck({ status: "idle" });
+                    setImgCheck({ status: "checking" });
+                    const r = await validateImageUrl(v);
+                    setImgCheck(r.ok ? { status: "ok" } : { status: "bad", reason: r.reason });
+                  }}
+                  placeholder="Or paste image URL"
+                />
+                {imgCheck.status === "checking" && <p className="flex items-center gap-1 text-xs text-muted-foreground"><Loader2 className="h-3 w-3 animate-spin" /> Checking image…</p>}
+                {imgCheck.status === "ok" && <p className="flex items-center gap-1 text-xs text-leaf"><CheckCircle2 className="h-3 w-3" /> Image loads OK</p>}
+                {imgCheck.status === "bad" && <p className="flex items-center gap-1 text-xs text-destructive"><XCircle className="h-3 w-3" /> {imgCheck.reason}</p>}
               </div>
               <DialogFooter><Button type="button" variant="outline" onClick={() => setEditing(null)}>Cancel</Button><Button type="submit" disabled={save.isPending || uploading}>Save</Button></DialogFooter>
             </form>
