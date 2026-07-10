@@ -1,13 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, XCircle, ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CheckCircle2, XCircle, ExternalLink, Play, Download, Loader2 } from "lucide-react";
+import { verifyMediaUrls } from "@/lib/verify-media.functions";
 
 export const Route = createFileRoute("/_authenticated/admin/seo")({
   component: SeoPreviewPage,
 });
+
+type VerifyReport = Awaited<ReturnType<typeof verifyMediaUrls>>;
 
 const SITE_URL = "https://www.panducatering.in";
 const ROUTES = ["/", "/menu", "/veg", "/non-veg", "/booking", "/gallery", "/about", "/contact"];
