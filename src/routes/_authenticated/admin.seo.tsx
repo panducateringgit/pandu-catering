@@ -56,12 +56,86 @@ function SeoPreviewPage() {
   const sitemapReferenced = (robotsInfo?.text || "").includes(`${SITE_URL}/sitemap.xml`);
   const sitemapCoversRoutes = sitemapInfo ? ROUTES.every((r) => sitemapInfo.urls.some((u) => u.endsWith(r) || u.endsWith(r + "/"))) : false;
 
+  const runVerify = useServerFn(verifyMediaUrls);
+  const [report, setReport] = useState<VerifyReport | null>(null);
+  const verifyMut = useMutation({
+    mutationFn: async () => (await runVerify()) as VerifyReport,
+    onSuccess: (data) => setReport(data),
+  });
+
+  function downloadReport() {
+    if (!report) return;
+    const blob = new Blob([JSON.stringify(report, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `media-url-report-${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-3xl font-bold">SEO Preview</h1>
         <p className="mt-1 text-sm text-muted-foreground">Verify canonical, robots, sitemap, and Google Search Console verification before you redeploy.</p>
       </div>
+
+      <Card>
+        <CardContent className="space-y-4 p-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="font-semibold">Live media URL check</h2>
+              <p className="text-sm text-muted-foreground">Runs the same check as CI against homepage settings, menu images, and gallery media.</p>
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={() => verifyMut.mutate()} disabled={verifyMut.isPending}>
+                {verifyMut.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Play className="mr-2 h-4 w-4" />}
+                {verifyMut.isPending ? "Checking…" : "Run checks now"}
+              </Button>
+              <Button variant="outline" onClick={downloadReport} disabled={!report}>
+                <Download className="mr-2 h-4 w-4" /> Download report.json
+              </Button>
+            </div>
+          </div>
+          {verifyMut.isError && <p className="text-sm text-destructive">Failed: {String((verifyMut.error as any)?.message ?? verifyMut.error)}</p>}
+          {report && (
+            <div className="space-y-3">
+              <div className="flex flex-wrap gap-2 text-sm">
+                <Badge variant="secondary">Total: {report.total}</Badge>
+                <Badge className="bg-leaf text-white">OK: {report.ok}</Badge>
+                <Badge variant={report.failed ? "destructive" : "secondary"}>Failed: {report.failed}</Badge>
+                <Badge variant="outline">gallery: {report.by_source.gallery_media}</Badge>
+                <Badge variant="outline">menu: {report.by_source.menu_items}</Badge>
+                <Badge variant="outline">settings: {report.by_source.site_settings}</Badge>
+                <span className="text-muted-foreground">at {new Date(report.generated_at).toLocaleString()}</span>
+              </div>
+              <div className="max-h-72 overflow-auto rounded-md border">
+                <table className="w-full text-xs">
+                  <thead className="sticky top-0 bg-secondary/60">
+                    <tr className="text-left">
+                      <th className="p-2">Status</th><th className="p-2">Source</th><th className="p-2">ID</th><th className="p-2">URL</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {report.results.map((r, i) => (
+                      <tr key={i} className={r.ok ? "" : "bg-destructive/10"}>
+                        <td className="p-2 font-mono">{r.status || "ERR"}</td>
+                        <td className="p-2">{r.source}</td>
+                        <td className="p-2 font-mono truncate max-w-[8rem]" title={r.id}>{r.id}</td>
+                        <td className="p-2 truncate"><a href={r.url} target="_blank" rel="noopener" className="underline">{r.url}</a></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
 
       <Card>
         <CardContent className="space-y-3 p-6">
